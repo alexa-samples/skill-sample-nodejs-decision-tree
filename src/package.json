@@ -1,0 +1,12 @@
+{
+  "name": "Decision Tree",
+  "version": "1.0.0",
+  "description": "Alexa Decision Tree template",
+  "main": "index.js",
+  "dependencies": {
+    "alexa-sdk": "^1.0.0"
+  },
+  "devDependencies": {},
+  "author": "Matchbox",
+  "license": "ISC"
+}
