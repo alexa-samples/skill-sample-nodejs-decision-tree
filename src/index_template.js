@@ -2,7 +2,7 @@
  * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
  * The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well as
  * testing instructions are located at http://amzn.to/1LzFrj6
- * 
+ *
  * For additional samples, visit the Alexa Skills Kit Getting Started guide at
  * http://amzn.to/1LGWsLG
  */
@@ -110,6 +110,7 @@ var startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         var loopFound = helper.debugFunction_walkNode(START_NODE);
         if( loopFound === true)
         {
+            // comment out this line if you know that there are no loops in your decision tree
              this.emit(':tell', loopsDetectedMessage);
         }
         // ---------------------------------------------------------------
@@ -208,18 +209,9 @@ var descriptionHandlers = Alexa.CreateStateHandler(states.DESCRIPTIONMODE, {
         this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
     },
     'DescriptionIntent': function () {
-        var reply = this.event.request.intent.slots.Description.value;
-        console.log('HEARD:' + reply);
-
-        if( reply === utteranceTellMeMore){
-            helper.giveDescription(this);
-        } else if( reply === utterancePlayAgain) {
-            // reset the game state to start mode
-            this.handler.state = states.STARTMODE;
-            this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
-        } else {
-             this.emit(':ask', playAgainMessage, playAgainMessage);
-        }
+        //var reply = this.event.request.intent.slots.Description.value;
+        //console.log('HEARD:' + reply);
+        helper.giveDescription(this);
     },
     'Unhandled': function () {
         this.emit(':ask', promptToSayYesNo, promptToSayYesNo);
