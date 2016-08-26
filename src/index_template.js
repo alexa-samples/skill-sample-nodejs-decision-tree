@@ -2,7 +2,7 @@
  * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
  * The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well as
  * testing instructions are located at http://amzn.to/1LzFrj6
- * 
+ *
  * For additional samples, visit the Alexa Skills Kit Getting Started guide at
  * http://amzn.to/1LGWsLG
  */
@@ -92,10 +92,17 @@ exports.handler = function (event, context, callback) {
 
 // set state to start up and  welcome the user
 var newSessionHandler = {
-    'NewSession': function () {
-        this.handler.state = states.STARTMODE;
-        this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
-    }
+  'LaunchRequest': function () {
+    this.handler.state = states.STARTMODE;
+    this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
+  },'AMAZON.HelpIntent': function () {
+    this.handler.state = states.STARTMODE;
+    this.emit(':ask', helpMessage, helpMessage);
+  },
+  'Unhandled': function () {
+    this.handler.state = states.STARTMODE;
+    this.emit(':ask', promptToStartMessage, promptToStartMessage);
+  }
 };
 
 // --------------- Functions that control the skill's behavior -----------------------
