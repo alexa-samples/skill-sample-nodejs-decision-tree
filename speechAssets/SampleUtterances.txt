@@ -1,6 +1,7 @@
 DescriptionIntent {Description} please
 DescriptionIntent please {Description}
-DescriptionIntent {Description} 
+DescriptionIntent {Description}
+DescriptionIntent can you {Description}
 DescriptionIntent tell me about that
 DescriptionIntent description please
 AMAZON.StopIntent stop
@@ -9,3 +10,4 @@ AMAZON.StopIntent shut up
 AMAZON.StartOverIntent start over
 AMAZON.StartOverIntent restart
 AMAZON.StartOverIntent start again
+AMAZON.StartOverIntent play again
