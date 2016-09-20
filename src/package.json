@@ -7,6 +7,6 @@
     "alexa-sdk": "^1.0.0"
   },
   "devDependencies": {},
-  "author": "Matchbox",
-  "license": "ISC"
+  "author": "Amazon.com",
+  "license": "SEE LICENSE IN license.md"
 }
