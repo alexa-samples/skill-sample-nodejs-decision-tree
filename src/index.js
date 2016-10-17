@@ -252,7 +252,7 @@ var helper = {
 
             // the current node was not found in the nodes array
             // this is due to the current node in the nodes array having a yes / no node id for a node that does not exist
-            context.emit(':tell', nodeNotFoundMessage, nodeNotFoundMessage);
+            context.emit(':tell', nodeNotFoundMessage);
         }
 
         // get the speech for the child node
