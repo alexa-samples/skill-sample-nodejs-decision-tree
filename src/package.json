@@ -1,5 +1,5 @@
 {
-  "name": "Decision Tree",
+  "name": "DecisionTree",
   "version": "1.0.0",
   "description": "Alexa Decision Tree template",
   "main": "index.js",
