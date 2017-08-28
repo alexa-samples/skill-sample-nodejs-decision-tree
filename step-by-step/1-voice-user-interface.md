@@ -100,7 +100,7 @@ There are two parts to an Alexa skill.  The first part is the [Voice User Interf
 
         1.  Use the same name for **Enter Type** that is already listed in the intent schema: descriptionType
 
-        2.  Copy the state abbreviations below and paste them in the **Enter Values** box.
+        2.  Copy the slot values below and paste them in the **Enter Values** box.
 
             ```
             tell me more
