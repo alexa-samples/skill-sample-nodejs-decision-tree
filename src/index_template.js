@@ -15,6 +15,7 @@ var states = {
     DESCRIPTIONMODE: '_DESCRIPTIONMODE'     // Alexa is describing the final choice and prompting to start again or quit
 };
 
+// TODO: Replace this data with your own.
 // Questions
 var nodes = [{ "node": 1, "message": "Enter question here", "yes": 2, "no": 3 },
              { "node": 2, "message": "Enter question here", "yes": 4, "no": 5 },
@@ -24,7 +25,7 @@ var nodes = [{ "node": 1, "message": "Enter question here", "yes": 2, "no": 3 },
              { "node": 6, "message": "Enter question here", "yes": 12, "no": 13 },
              { "node": 7, "message": "Enter question here", "yes": 14, "no": 15 },
 
-
+// TODO: Replace this data with your own.
 // Answers & descriptions
              { "node": 8, "message": "Enter answer here", "yes": 0, "no": 0, "description": "Enter description here." },
              { "node": 9, "message": "Enter answer here", "yes": 0, "no": 0, "description": "Enter description here." },
@@ -42,6 +43,7 @@ var visited = [nodes.length];
 
 // These are messages that Alexa says to the user during conversation
 
+// TODO: Replace this data with your own.
 // This is the intial welcome message
 var welcomeMessage = "Enter message here";
 
