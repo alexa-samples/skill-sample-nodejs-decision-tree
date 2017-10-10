@@ -1,0 +1,73 @@
+{
+    "intents": [
+      {
+        "name": "AMAZON.CancelIntent",  
+        "samples": []  
+      },
+      {
+        "name": "AMAZON.HelpIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.StopIntent",
+        "samples": []
+      },
+      {
+        "name": "AMAZON.YesIntent",
+        "samples": []
+      }, 
+      {
+        "name": "AMAZON.NoIntent",
+        "samples": []
+      }, 
+      {
+        "name": "AMAZON.StartOverIntent",
+        "samples": []
+      },
+      {
+        "name": "DescriptionIntent",
+        "samples": [
+            "{Description please",
+            "please {Description}",
+            "{Description}",
+            "can you {Description}",
+            "tell me about that",
+            "description please"
+        ],
+        "slots": [
+            {
+                "name": "Description",
+                "type": "descriptionType"
+            }
+        ]
+      }
+    ],
+    "types": [
+      {
+        "name": "descriptionType",
+        "values": [
+          {
+            "id": null,
+            "name": {
+              "value": "tell me more",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "describe it",
+              "synonyms": []
+            }
+          },
+          {
+            "id": null,
+            "name": {
+              "value": "describe",
+              "synonyms": []
+            }
+          }
+        ]
+      }
+    ]
+  }
