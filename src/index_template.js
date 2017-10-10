@@ -96,14 +96,17 @@ exports.handler = function (event, context, callback) {
 var newSessionHandler = {
   'LaunchRequest': function () {
     this.handler.state = states.STARTMODE;
-    this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
+    this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
+    this.emit(':responseReady');
   },'AMAZON.HelpIntent': function () {
     this.handler.state = states.STARTMODE;
-    this.emit(':ask', helpMessage, helpMessage);
+    this.response.speak(helpMessage).listen(helpMessage);
+    this.emit(':responseReady');    
   },
   'Unhandled': function () {
     this.handler.state = states.STARTMODE;
-    this.emit(':ask', promptToStartMessage, promptToStartMessage);
+    this.response.speak(promptToStartMessage).listen(promptToStartMessage);
+    this.emit(':responseReady');    
   }
 };
 
@@ -120,7 +123,7 @@ var startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         if( loopFound === true)
         {
             // comment out this line if you know that there are no loops in your decision tree
-             this.emit(':tell', loopsDetectedMessage);
+             this.response.speak(loopsDetectedMessage);
         }
         // ---------------------------------------------------------------
 
@@ -134,26 +137,33 @@ var startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         this.attributes.currentNode = START_NODE;
 
         // ask the first question
-        this.emit(':ask', message, message);
+        this.response.speak(message).listen(message);
+        this.emit(':responseReady');        
     },
     'AMAZON.NoIntent': function () {
         // Handle No intent.
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.StopIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.CancelIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.StartOverIntent': function () {
-         this.emit(':ask', promptToStartMessage, promptToStartMessage);
+         this.response.speak(promptToStartMessage).listen(promptToStartMessage);
+         this.emit(':responseReady');         
     },
     'AMAZON.HelpIntent': function () {
-        this.emit(':ask', helpMessage, helpMessage);
+        this.response.speak(helpMessage).listen(helpMessage);
+        this.emit(':responseReady');        
     },
     'Unhandled': function () {
-        this.emit(':ask', promptToStartMessage, promptToStartMessage);
+        this.response.speak(promptToStartMessage).listen(promptToStartMessage);
+        this.emit(':responseReady');        
     }
 });
 
@@ -166,27 +176,34 @@ var askQuestionHandlers = Alexa.CreateStateHandler(states.ASKMODE, {
     'AMAZON.YesIntent': function () {
         // Handle Yes intent.
         helper.yesOrNo(this,'yes');
+        this.emit(':responseReady');        
     },
     'AMAZON.NoIntent': function () {
         // Handle No intent.
          helper.yesOrNo(this, 'no');
+         this.emit(':responseReady');         
     },
     'AMAZON.HelpIntent': function () {
-        this.emit(':ask', promptToSayYesNo, promptToSayYesNo);
+        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
+        this.emit(':responseReady');        
     },
     'AMAZON.StopIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.CancelIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.StartOverIntent': function () {
         // reset the game state to start mode
         this.handler.state = states.STARTMODE;
-        this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
+        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
+        this.emit(':responseReady');        
     },
     'Unhandled': function () {
-        this.emit(':ask', promptToSayYesNo, promptToSayYesNo);
+        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
+        this.emit(':responseReady');        
     }
 });
 
@@ -197,25 +214,31 @@ var descriptionHandlers = Alexa.CreateStateHandler(states.DESCRIPTIONMODE, {
         // Handle Yes intent.
         // reset the game state to start mode
         this.handler.state = states.STARTMODE;
-        this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
+        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.NoIntent': function () {
         // Handle No intent.
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.HelpIntent': function () {
-        this.emit(':ask', promptToSayYesNo, promptToSayYesNo);
+        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
+        this.emit(':responseReady');        
     },
     'AMAZON.StopIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.CancelIntent': function () {
-        this.emit(':tell', goodbyeMessage);
+        this.response.speak(goodbyeMessage);
+        this.emit(':responseReady');        
     },
     'AMAZON.StartOverIntent': function () {
         // reset the game state to start mode
         this.handler.state = states.STARTMODE;
-        this.emit(':ask', welcomeMessage, repeatWelcomeMessage);
+        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
+        this.emit(':responseReady');        
     },
     'DescriptionIntent': function () {
         //var reply = this.event.request.intent.slots.Description.value;
@@ -223,7 +246,8 @@ var descriptionHandlers = Alexa.CreateStateHandler(states.DESCRIPTIONMODE, {
         helper.giveDescription(this);
     },
     'Unhandled': function () {
-        this.emit(':ask', promptToSayYesNo, promptToSayYesNo);
+        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
+        this.emit(':responseReady');        
     }
 });
 
@@ -238,7 +262,7 @@ var helper = {
         var description = helper.getDescriptionForNode(context.attributes.currentNode);
         var message = description + ', ' + repeatWelcomeMessage;
 
-        context.emit(':ask', message, message);
+        context.response.speak(message).listen(message);
     },
 
     // logic to provide the responses to the yes or no responses to the main questions
@@ -254,7 +278,7 @@ var helper = {
 
             // the current node was not found in the nodes array
             // this is due to the current node in the nodes array having a yes / no node id for a node that does not exist
-            context.emit(':tell', nodeNotFoundMessage, nodeNotFoundMessage);
+            context.response.speak(nodeNotFoundMessage).listen(nodeNotFoundMessage);
         }
 
         // get the speech for the child node
@@ -273,7 +297,7 @@ var helper = {
         // set the current node to next node we want to go to
         context.attributes.currentNode = nextNodeId;
 
-        context.emit(':ask', message, message);
+        context.response.speak(message).listen(message);
     },
 
     // gets the description for the given node id
