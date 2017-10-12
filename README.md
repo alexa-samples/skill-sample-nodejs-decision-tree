@@ -41,7 +41,7 @@ In this sample skill, we'll explore how a decision tree can be implemented. Alex
 
 The response to each question will procedurally progress the user through the nodes (branches) in the decision tree. Alexa will continue asking more questions until a final decision node is reached, at which point she will suggest an ideal career for you!
 
-<a href="https://github.com/AlexaStaging/skill-sample-nodejs-decision-tree/blob/master/step-by-step/1-voice-user-interface.md"><img src="https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/buttons/button_get_started._TTH_.png" /></a>
+<a href="https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/step-by-step/1-voice-user-interface.md"><img src="https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/buttons/button_get_started._TTH_.png" /></a>
 
 <img height="1" width="1" src="https://www.facebook.com/tr?id=1847448698846169&ev=PageView&noscript=1"/>
 
