@@ -1,0 +1,77 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "decision tree",
+      "intents": [
+        {
+          "name": "AMAZON.YesIntent"
+        },
+        {
+          "name": "AMAZON.NoIntent"
+        },
+        {
+          "name": "AMAZON.HelpIntent"
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": [
+            "stop",
+            "off",
+            "shut up"
+          ]
+        },
+        {
+          "name": "AMAZON.CancelIntent"
+        },
+        {
+          "name": "AMAZON.StartOverIntent",
+          "samples": [
+            "start over",
+            "restart",
+            "start again",
+            "play again"
+          ]
+        },
+        {
+          "name": "DescriptionIntent",
+          "slots": [
+            {
+              "name": "Description",
+              "type": "descriptionType"
+            }
+          ],
+          "samples": [
+            "{Description} please",
+            "please {Description}",
+            "{Description}",
+            "can you {Description}",
+            "tell me about that",
+            "description please"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "tell me more"
+              }
+            },
+            {
+              "name": {
+                "value": "describe"
+              }
+            },
+            {
+              "name": {
+                "value": "describe it"
+              }
+            }
+          ],
+          "name": "descriptionType"
+        }
+      ]
+    }
+  }
+}
