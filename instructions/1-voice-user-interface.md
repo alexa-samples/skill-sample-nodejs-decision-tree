@@ -60,12 +60,11 @@ There are two parts to an Alexa skill.  The first part is the [Voice User Interf
 10. Click on the "Dashboard" button.
 
 
-11. Add some more sample utterances for your newly generated intents.  These are the things a user would say to make a specific intent happen.  Here are a few examples:
+11. Add some more sample utterances for your newly generated intents.  Think of all the different ways that a user could request to make a specific intent happen.  Here are a few examples for DescriptionIntent:
 
-    * am I free {date}
-    * whats am i doing {date}
-    * what are my plans {date}
-    * what meetings do i have {date}
+    * What is that
+    * Ive never heard of that, {Description}
+    * How does that work
 
     ![](https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/1-10-sample-utterances._TTH_.png)
 
