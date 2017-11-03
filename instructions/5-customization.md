@@ -9,21 +9,21 @@ At this point, you should have a working copy of our Decision Tree skill.  In or
 
 1.  **New data.** You will need to create a new set of messages, questions, answers, and descriptions for your skill.
 
-    1.  **Open a copy of index_template.js.** If you haven't already downloaded the code for this project, [you can find a copy of index_template.js here on GitHub](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/src/index_template.js).  You can use a simple, lightweight code editor like [Atom](http://atom.io), [Sublime Text](http://sublimetext.com), or [VSCode](http://code.visualstudio.com), but you also have the option to edit the code directly in your Lambda function.
+    1.  **Open a copy of index_template.js.** If you haven't already downloaded the code for this project, [you can find a copy of index_template.js here on GitHub](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/lambda/custom/index_template.js).  You can use a simple, lightweight code editor like [Atom](http://atom.io), [Sublime Text](http://sublimetext.com), or [VSCode](http://code.visualstudio.com), but you also have the option to edit the code directly in your Lambda function.
 
     2.  **Search for the comment "TODO: Replace this data with your own."**  These are the placeholders for our skill.  You can see that there are **questions**, **answers & descriptions**, and **messages or prompts**. Here's some things to consider:
 
         1. You can provide questions, answers, messages and prompts to customize your decision tree.
 
-        2. **A Quick Explanation of How it Works** Take a look at the code in [index_template.js at line 20](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/src/index_template.js#L20). Each "yes" or "no" answer maps to a different node in the `nodes` array. The resulting node may be a another question, in which case Alexa will expect another "yes" or "no" answer from the user before progressing to the next node. This will continue procedurally until an "answer" node is reached (nodes with `0` values for `yes` and `no` object properties). Once at an exit node, the programmatic end of the decision tree has been reached. Alexa will read the description to the user.
+        2. **A Quick Explanation of How it Works** Take a look at the code in [index_template.js at line 20](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/lambda/custom/index_template.js#L20). Each "yes" or "no" answer maps to a different node in the `nodes` array. The resulting node may be a another question, in which case Alexa will expect another "yes" or "no" answer from the user before progressing to the next node. This will continue procedurally until an "answer" node is reached (nodes with `0` values for `yes` and `no` object properties). Once at an exit node, the programmatic end of the decision tree has been reached. Alexa will read the description to the user.
 
         3. There are three states in this implementation. Each state has its own set of handlers. Take a look at the comments in the code to understand what they do in greater detail.
 
-            *  STARTMODE: [Line 96 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/src/index_template.js#L96) 
+            *  STARTMODE: [Line 96 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/lambda/custom/index_template.js#L96) 
             Prompt the user to start or restart the game.
-            *  ASKMODE: [Line 113 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/src/index_template.js#L113) 
+            *  ASKMODE: [Line 113 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/lambda/custom/index_template.js#L113) 
             Alexa is asking user the questions
-            *  DESCRIPTIONMODE: [Line 164 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/src/index_template.js#L164) 
+            *  DESCRIPTIONMODE: [Line 164 in index_template.js](https://github.com/alexa/skill-sample-nodejs-decision-tree/blob/master/lambda/custom/index_template.js#L164) 
             Alexa is describing the final choice and prompting to start again or quit.
 
 
