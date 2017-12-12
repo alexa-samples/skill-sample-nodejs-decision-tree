@@ -1,0 +1,83 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.NoIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StartOverIntent",
+      "samples": [
+        "start over",
+        "restart",
+        "start again",
+        "play again"
+      ]
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": [
+        "stop",
+        "off",
+        "shut up"
+      ]
+    },
+    {
+      "name": "AMAZON.YesIntent",
+      "samples": []
+    },
+    {
+      "name": "DescriptionIntent",
+      "samples": [
+        "{Description} please",
+        "please {Description}",
+        "{Description}",
+        "can you {Description}",
+        "tell me about that",
+        "description please"
+      ],
+      "slots": [
+        {
+          "name": "Description",
+          "type": "descriptionType",
+          "samples": []
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "descriptionType",
+      "values": [
+        {
+          "id": null,
+          "name": {
+            "value": "tell me more",
+            "synonyms": []
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "describe",
+            "synonyms": []
+          }
+        },
+        {
+          "id": null,
+          "name": {
+            "value": "describe it",
+            "synonyms": []
+          }
+        }
+      ]
+    }
+  ]
+}
