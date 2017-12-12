@@ -5,24 +5,42 @@
 
 # How to Build a Decision Tree skill for Alexa
 
+
 ## What You Will Learn
 *  [AWS Lambda](http://aws.amazon.com/lambda)
 *  [Alexa Skills Kit (ASK)](https://developer.amazon.com/alexa-skills-kit)
 *  Voice User Interface (VUI) Design
 *  Skill Certification
+*  Reprompts
 *  State Management
-*  [Speechcons](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speechcon-reference)
+*  A Simple Binary ("Yes" or "No") Decision Tree Algorithm Implementation
 
 ## What You Will Need
 *  [Amazon Developer Portal Account](http://developer.amazon.com)
 *  [Amazon Web Services Account](http://aws.amazon.com/)
-*  The sample code on [GitHub](https://github.com/alexa/skill-sample-nodejs-decision-tree).
-*  Simple graphical editing tool
+*  The sample code provided in this repository.
+*  A series of yes or no questions to ask your users and results based on their answers. Good types of question and answers for this could be:
+*  Magazine style quizzes like "What kind of job is good for me?", or "Which superhero personality type am I?"
+*  Suggestion and Recommendation based skills like "Where cuisine should I eat today?", or "What genre of movie should I watch?"
 
 ## What Your Skill Will Do
-This is a simple guessing game to play with Alexa. You guess a number, she tells you if it's higher or lower. At the beginning of each game, Alexa will tell you how many times you've played.
 
-If you’re in the US, we've also included the new [speechcons](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/speechcon-reference) feature for Alexa skill development. Speechcons are special words and phrases that Alexa pronounces more expressively. We use them in this quiz game to let the user know whether they gave a correct or incorrect answer during the quiz.
+We make choices every day. We choose what to wear, where to go for dinner, which route to take to work or school. Decision making is a vital and regular part of our livelihood.
+
+Sometimes we're faced with so many choices, that arriving at a conclusive decision can be difficult. Decision trees can help simplify this for us.
+
+Decision trees are a model that provide a structured process to chart out a course of action or arrive at a generalized conclusion, based on specific facts. Inherent in their name, decision trees are visualized as a tree like structure illuminating possible outcomes down a series of branches.
+
+To learn more about decision trees, a good place to start would be [the wikipedia page for Decision Trees](https://en.wikipedia.org/wiki/Decision_tree)
+
+Decision trees can form the basis of many different kinds of Alexa skills. In a turn based adventure game, presenting a user with a choice can progress a narrative. Additionally, decision trees can be utilized to recommend, or suggest a course of action (i.e. "What movie should I watch?").
+
+In this sample skill, we'll explore how a decision tree can be implemented. Alexa will provide an ideal career by asking a series of questions and giving you an answer. Alexa will ask questions such as:
+*   "Do you like working with people?"
+*   "Do you like caring for others?"
+*   "Would you like to work during the day?"
+
+The response to each question will procedurally progress the user through the nodes (branches) in the decision tree. Alexa will continue asking more questions until a final decision node is reached, at which point she will suggest an ideal career for you!
 
 <a href="1-voice-user-interface.md"><img src="https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/buttons/button_get_started._TTH_.png" /></a>
 
