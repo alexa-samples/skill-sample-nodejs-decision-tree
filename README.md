@@ -58,7 +58,7 @@ Alexa, open decision tree.
 	$ ask init
 	```
 
-3. Install npm dependencies by navigating into the `/lambda` directory and running the npm command: `npm install`
+3. Install npm dependencies by navigating into the `/lambda/custom` directory and running the npm command: `npm install`
 
 	```bash
 	$ cd lambda/custom
@@ -83,7 +83,7 @@ ASK CLI will create the skill and the lambda function for you. The Lambda functi
 2. Simulate verbal interaction with your skill through the command line using the following example:
 
 	```bash
-	 $ ask simulate -l en-US -t "alexa, start decision tree"
+	 $ ask simulate -l en-US -t "start decision tree"
 
 	 ✓ Simulation created for simulation id: 4a7a9ed8-94b2-40c0-b3bd-fb63d9887fa7
 	◡ Waiting for simulation response{
