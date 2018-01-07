@@ -41,7 +41,8 @@
         "{Description}",
         "can you {Description}",
         "tell me about that",
-        "description please"
+        "description please",
+        "tell me more"
       ],
       "slots": [
         {
