@@ -57,7 +57,7 @@ const promptToSayYesNo = "Say yes or no to answer the question.";
 const decisionMessage = "I think you would make a good";
 
 // This is the prompt to ask the user if they would like to hear a short description of their chosen profession or to play again
-const playAgainMessage = "Say 'tell me more' to hear a short description for this profession, or do you want to play again?";
+const playAgainMessage = "Say 'tell me more' to hear a short description for this profession, or say 'yes' if you want to play again. ";
 
 // This is the help message during the setup at the beginning of the game
 const helpMessage = "I will ask you some questions that will identify what you would be best at. Want to start now?";
