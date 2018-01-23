@@ -73,10 +73,6 @@ const descriptionNotFoundMessage = "Could not find description for node";
 
 const loopsDetectedMessage = "A repeated path was detected on the node tree, please fix before continuing";
 
-const utteranceTellMeMore = "tell me more";
-
-const utterancePlayAgain = "play again";
-
 // the first node that we will use
 let START_NODE = 1;
 

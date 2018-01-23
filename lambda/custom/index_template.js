@@ -76,10 +76,6 @@ const descriptionNotFoundMessage = "Could not find description for node";
 
 const loopsDetectedMessage = "A potential loop was detected on the node tree, please fix before continuing";
 
-const utteranceTellMeMore = "Enter utterance here";
-
-const utterancePlayAgain = "Enter utterance here";
-
 // the first node that we will use
 let START_NODE = 1;
 
