@@ -1,403 +1,333 @@
 /**
- * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
- * The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well as
- * testing instructions are located at http://amzn.to/1LzFrj6
- *
- * For additional samples, visit the Alexa Skills Kit Getting Started guide at
- * http://amzn.to/1LGWsLG
- */
 
-const Alexa = require('alexa-sdk');
+    Copyright 2017 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+    Licensed under the Amazon Software License (the "License").
+    You may not use this file except in compliance with the License.
+    A copy of the License is located at
+      http://aws.amazon.com/asl/
+    or in the "license" file accompanying this file. This file is distributed
+    on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express
+    or implied. See the License for the specific language governing
+    permissions and limitations under the License.
 
-const states = {
-    STARTMODE: '_STARTMODE',                // Prompt the user to start or restart the game.
-    ASKMODE: '_ASKMODE',                    // Alexa is asking user the questions.
-    DESCRIPTIONMODE: '_DESCRIPTIONMODE'     // Alexa is describing the final choice and prompting to start again or quit
+    This skill demonstrates how to use Dialog Management to delegate slot
+    elicitation to Alexa. For more information on Dialog Directives see the
+    documentation: https://developer.amazon.com/docs/custom-skills/dialog-interface-reference.html
+
+    This skill also uses entity resolution to define synonyms. Combined with
+    dialog management, the skill can ask the user for clarification of a synonym
+    is mapped to two slot values.
+ **/
+
+
+"use strict";
+const Alexa = require("alexa-sdk");
+
+// For detailed tutorial on how to make an Alexa skill,
+// please visit us at http://alexa.design/build
+
+let handlers = {
+    "LaunchRequest": function () {
+        console.log("in LaunchRequest");
+        this.response.speak("Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?");
+        this.response.listen("Do you want a career or to be a couch potato?");
+        this.emit(":responseReady");
+    },
+    "CouchPotatoIntent": function () {
+
+        this.response.speak("You don't want to start your career? Have fun wasting away on the couch.");
+        this.emit(":responseReady");
+    },
+    "RecommendationIntent": function () {
+        // delegate to Alexa to collect all the required slots
+
+        let filledSlots = delegateSlotCollection.call(this);
+
+        if (!filledSlots) {
+            return;
+        }
+
+        console.log("filled slots: " + JSON.stringify(filledSlots));
+        // at this point, we know that all required slots are filled.
+        let slotValues = getSlotValues(filledSlots);
+
+        console.log(JSON.stringify(slotValues));
+
+        let key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
+        let occupation = options[slotsToOptionsMap[key]];
+
+        console.log("look up key: ", key, "object: ", occupation);
+
+        let speechOutput = "So you want to be " + slotValues.salaryImportance.resolved +
+                ". You are an " + slotValues.personality.resolved +
+                ", you like " + slotValues.preferredSpecies.resolved +
+                "  and you " + (slotValues.bloodTolerance.resolved === "high" ? "can" : "can't" ) +
+                " tolerate blood " +
+                ". You should consider being a " + occupation.name;
+
+        console.log("Speech output: ", speechOutput);
+        this.response.speak(speechOutput);
+        this.emit(":responseReady");
+
+    },
+    "SessionEndedRequest": function () {
+        console.log("Session ended with reason: " + this.event.request.reason);
+    },
+    "AMAZON.StopIntent": function () {
+        this.response.speak("Bye");
+        this.emit(":responseReady");
+    },
+    "AMAZON.HelpIntent": function () {
+        this.response.speak("This is Decision Tree. I can help you find the perfect job. " +
+           "You can say, recommend a job.").listen("Would you like a career or do you want to be a couch potato?");
+        this.emit(":responseReady");
+    },
+    "AMAZON.CancelIntent": function () {
+        this.response.speak("Bye");
+        this.emit(":responseReady");
+    },
+    "Unhandled": function () {
+        this.response.speak("Sorry, I didn't get that. You can try: 'alexa, tell Decision Tree to" +
+            " recommend a job.'");
+    }
 };
 
+exports.handler = function (event, context) {
 
-// Questions
-const nodes = [{ "node": 1, "message": "Do you like working with people", "yes": 2, "no": 3 },
-             { "node": 2, "message": "Do you like caring for others", "yes": 4, "no": 5 },
-             { "node": 3, "message": "Would you like to work during the day", "yes": 6, "no": 7 },
-             { "node": 4, "message": "Can you stand the sight of blood", "yes": 8, "no": 9 },
-             { "node": 5, "message": "Is money the most important thing in your life", "yes": 10, "no": 11 },
-             { "node": 6, "message": "Do you want to work with animals", "yes": 12, "no": 13 },
-             { "node": 7, "message": "Are you active", "yes": 14, "no": 15 },
+    // Each time your lambda function is triggered from your skill,
+    // the event's JSON will be logged. Check Cloud Watch to see the event.
+    // You can copy the log from Cloud Watch and use it for testing.
+    console.log("====================");
+    console.log("REQUEST: " + JSON.stringify(event));
+    console.log("====================");
+    let alexa = Alexa.handler(event, context);
 
-// Answers & descriptions
-             { "node": 8, "message": "Doctor", "yes": 0, "no": 0, "description": "A physician or medical doctor is a professional who practices medicine." },
-             { "node": 9, "message": "Teacher", "yes": 0, "no": 0, "description": "In education, teachers facilitate student learning, often in a school or academy or perhaps in another environment such as outdoors."},
-             { "node": 10, "message": "Sales person", "yes": 0, "no": 0 , "description": "A salesman is someone who works in sales, with the main function of selling products or services to others."},
-             { "node": 11, "message": "Artist", "yes": 0, "no": 0 , "description": "An artist is a person engaged in one or more of any of a broad spectrum of activities related to creating art, practicing the arts, and, or demonstrating an art."},
-             { "node": 12, "message": "Zookeeper", "yes": 0, "no": 0 , "description": "A zookeeper is a person who manages zoo animals that are kept in captivity for conservation or to be displayed to the public, and are usually responsible for the feeding and daily care of the animals."},
-             { "node": 13, "message": "Software engineer", "yes": 0, "no": 0 , "description": "A software engineer is a person who applies the principles of software engineering to the design, development, maintenance, testing, and evaluation of the software and systems that make computers or anything containing software work."},
-             { "node": 14, "message": "Security Guard", "yes": 0, "no": 0 , "description": "A security guard is a private person who is paid to protect an organization's assets from various hazards such as criminal activity, by utilizing preventative measures. "},
-             { "node": 15, "message": "Lighthouse keeper", "yes": 0, "no": 0 , "description": "A lighthouse keeper is the person responsible for tending and caring for a lighthouse, particularly the light and lens in the days when oil lamps and clockwork mechanisms were used."},
-];
-
-// This is used for keeping track of visited nodes when we test for loops in the tree
-let visited;
-
-// These are messages that Alexa says to the user during conversation
-
-// This is the initial welcome message
-const welcomeMessage = "Welcome to decision tree, are you ready to play?";
-
-// This is the message that is repeated if the response to the initial welcome message is not heard
-const repeatWelcomeMessage = "Say yes to start the game or no to quit.";
-
-// This is the message that is repeated if Alexa does not hear/understand the response to the welcome message
-const promptToStartMessage = "Say yes to continue, or no to end the game.";
-
-// This is the prompt during the game when Alexa doesnt hear or understand a yes / no reply
-const promptToSayYesNo = "Say yes or no to answer the question.";
-
-// This is the response to the user after the final question when Alexa decides on what group choice the user should be given
-const decisionMessage = "I think you would make a good";
-
-// This is the prompt to ask the user if they would like to hear a short description of their chosen profession or to play again
-const playAgainMessage = "Say 'tell me more' to hear a short description for this profession, or say 'yes' if you want to play again. ";
-
-// This is the help message during the setup at the beginning of the game
-const helpMessage = "I will ask you some questions that will identify what you would be best at. Want to start now?";
-
-// This is the goodbye message when the user has asked to quit the game
-const goodbyeMessage = "Ok, see you next time!";
-
-const speechNotFoundMessage = "Could not find speech for node";
-
-const nodeNotFoundMessage = "In nodes array could not find node";
-
-const descriptionNotFoundMessage = "Could not find description for node";
-
-const loopsDetectedMessage = "A repeated path was detected on the node tree, please fix before continuing";
-
-// the first node that we will use
-let START_NODE = 1;
-
-// --------------- Handlers -----------------------
-
-// Called when the session starts.
-exports.handler = function (event, context, callback) {
-    const alexa = Alexa.handler(event, context);
-    alexa.registerHandlers(newSessionHandler, startGameHandlers, askQuestionHandlers, descriptionHandlers);
+    // Part 3: Task 4
+    // alexa.dynamoDBTableName = 'petMatchTable';
+    alexa.registerHandlers(handlers);
     alexa.execute();
 };
 
-// set state to start up and  welcome the user
-const newSessionHandler = {
-  'LaunchRequest': function () {
-    this.handler.state = states.STARTMODE;
-    this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
-    this.emit(':responseReady');
-  },'AMAZON.HelpIntent': function () {
-    this.handler.state = states.STARTMODE;
-    this.response.speak(helpMessage).listen(helpMessage);
-    this.emit(':responseReady');
-  },
-  'Unhandled': function () {
-    this.handler.state = states.STARTMODE;
-    this.response.speak(promptToStartMessage).listen(promptToStartMessage);
-    this.emit(':responseReady');
-  }
+
+const REQUIRED_SLOTS = [
+    "preferredSpecies",
+    "bloodTolerance",
+    "personality",
+    "salaryImportance"
+];
+
+const slotsToOptionsMap = {
+    "unimportant-introvert-low-animals": 20,
+    "unimportant-introvert-low-people": 8,
+    "unimportant-introvert-high-animals": 1,
+    "unimportant-introvert-high-people": 4,
+    "unimportant-extrovert-low-animals": 10,
+    "unimportant-extrovert-low-people": 3,
+    "unimportant-extrovert-high-animals": 11,
+    "unimportant-extrovert-high-people": 13,
+    "somewhat-introvert-low-animals": 20,
+    "somewhat-introvert-low-people": 6,
+    "somewhat-introvert-high-animals": 19,
+    "somewhat-introvert-high-people": 14,
+    "somewhat-extrovert-low-animals": 2,
+    "somewhat-extrovert-low-people": 12,
+    "somewhat-extrovert-high-animals": 17,
+    "somewhat-extrovert-high-people": 16,
+    "very-introvert-low-animals": 9,
+    "very-introvert-low-people": 15,
+    "very-introvert-high-animals": 17,
+    "very-introvert-high-people": 7,
+    "very-extrovert-low-animals": 17,
+    "very-extrovert-low-people": 0,
+    "very-extrovert-high-animals": 1,
+    "very-extrovert-high-people": 5
 };
 
-// --------------- Functions that control the skill's behavior -----------------------
+const options = [
+    {"name": "Actor", "description": ""},
+    {"name": "Animal Control Worker", "description": ""},
+    {"name": "Animal Shelter Manager", "description": ""},
+    {"name": "Artist", "description": ""},
+    {"name": "Court Reporter", "description": ""},
+    {"name": "Doctor", "description": ""},
+    {"name": "Geoscientist", "description": ""},
+    {"name": "Investment Banker", "description": ""},
+    {"name": "Lighthouse Keeper", "description": ""},
+    {"name": "Marine Ecologist", "description": ""},
+    {"name": "Park Naturalist", "description": ""},
+    {"name": "Pet Groomer", "description": ""},
+    {"name": "Physical Therapist", "description": ""},
+    {"name": "Security Guard", "description": ""},
+    {"name": "Social Media Engineer", "description": ""},
+    {"name": "Software Engineer", "description": ""},
+    {"name": "Teacher", "description": ""},
+    {"name": "Veterinary", "description": ""},
+    {"name": "Veterinary Dentist", "description": ""},
+    {"name": "Zookeeper", "description": ""},
+    {"name": "Zoologist", "description": ""}
+];
 
-// Called at the start of the game, picks and asks first question for the user
-const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
-    'AMAZON.YesIntent': function () {
+// ***********************************
+// ** Helper functions from
+// ** These should not need to be edited
+// ** www.github.com/alexa/alexa-cookbook
+// ***********************************
 
-        // ---------------------------------------------------------------
-        // check to see if there are any loops in the node tree - this section can be removed in production code
-        visited = [nodes.length];
-        let loopFound = helper.debugFunction_walkNode(START_NODE);
-        if( loopFound === true)
-        {
-            // comment out this line if you know that there are no loops in your decision tree
-             this.response.speak(loopsDetectedMessage);
-        }
-        // ---------------------------------------------------------------
+// ***********************************
+// ** Dialog Management
+// ***********************************
 
-        // set state to asking questions
-        this.handler.state = states.ASKMODE;
+function getSlotValues(filledSlots) {
+    //given event.request.intent.slots, a slots values object so you have
+    //what synonym the person said - .synonym
+    //what that resolved to - .resolved
+    //and if it's a word that is in your slot values - .isValidated
+    let slotValues = {};
 
-        // ask first question, the response will be handled in the askQuestionHandler
-        let message = helper.getSpeechForNode(START_NODE);
+    console.log("The filled slots: " + JSON.stringify(filledSlots));
+    Object.keys(filledSlots).forEach(function (item) {
 
-        // record the node we are on
-        this.attributes.currentNode = START_NODE;
+        // console.log("item in filledSlots: "+JSON.stringify(filledSlots[item]));
 
-        // ask the first question
-        this.response.speak(message).listen(message);
-        this.emit(':responseReady');
-    },
-    'AMAZON.NoIntent': function () {
-        // Handle No intent.
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StopIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.CancelIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StartOverIntent': function () {
-         this.response.speak(promptToStartMessage).listen(promptToStartMessage);
-         this.emit(':responseReady');
-    },
-    'AMAZON.HelpIntent': function () {
-        this.response.speak(helpMessage).listen(helpMessage);
-        this.emit(':responseReady');
-    },
-    'Unhandled': function () {
-        this.response.speak(promptToStartMessage).listen(promptToStartMessage);
-        this.emit(':responseReady');
-    }
-});
+        let name = filledSlots[item].name;
+        //console.log("name: "+name);
 
+        if (filledSlots[item] &&
+             filledSlots[item].resolutions &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
 
-// user will have been asked a question when this intent is called. We want to look at their yes/no
-// response and then ask another question. If we have asked more than the requested number of questions Alexa will
-// make a choice, inform the user and then ask if they want to play again
-const askQuestionHandlers = Alexa.CreateStateHandler(states.ASKMODE, {
-
-    'AMAZON.YesIntent': function () {
-        // Handle Yes intent.
-        helper.yesOrNo(this,'yes');
-        this.emit(':responseReady');
-    },
-    'AMAZON.NoIntent': function () {
-        // Handle No intent.
-         helper.yesOrNo(this, 'no');
-         this.emit(':responseReady');
-    },
-    'AMAZON.HelpIntent': function () {
-        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StopIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.CancelIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StartOverIntent': function () {
-        // reset the game state to start mode
-        this.handler.state = states.STARTMODE;
-        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
-        this.emit(':responseReady');
-    },
-    'Unhandled': function () {
-        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
-        this.emit(':responseReady');
-    }
-});
-
-// user has heard the final choice and has been asked if they want to hear the description or to play again
-const descriptionHandlers = Alexa.CreateStateHandler(states.DESCRIPTIONMODE, {
-
- 'AMAZON.YesIntent': function () {
-        // Handle Yes intent.
-        // reset the game state to start mode
-        this.handler.state = states.STARTMODE;
-        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.NoIntent': function () {
-        // Handle No intent.
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.HelpIntent': function () {
-        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StopIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.CancelIntent': function () {
-        this.response.speak(goodbyeMessage);
-        this.emit(':responseReady');
-    },
-    'AMAZON.StartOverIntent': function () {
-        // reset the game state to start mode
-        this.handler.state = states.STARTMODE;
-        this.response.speak(welcomeMessage).listen(repeatWelcomeMessage);
-        this.emit(':responseReady');
-    },
-    'DescriptionIntent': function () {
-        //const reply = this.event.request.intent.slots.Description.value;
-        //console.log('HEARD:' + reply);
-        helper.giveDescription(this);
-    },
-    'Unhandled': function () {
-        this.response.speak(promptToSayYesNo).listen(promptToSayYesNo);
-        this.emit(':responseReady');
-    }
-});
-
-// --------------- Helper Functions  -----------------------
-
-const helper = {
-
-    // gives the user more information on their final choice
-    giveDescription: function (context) {
-
-        // get the speech for the child node
-        let description = helper.getDescriptionForNode(context.attributes.currentNode);
-        let message = description + ', ' + repeatWelcomeMessage;
-
-        context.response.speak(message).listen(message);
-    },
-
-    // logic to provide the responses to the yes or no responses to the main questions
-    yesOrNo: function (context, reply) {
-
-        // this is a question node so we need to see if the user picked yes or no
-        let nextNodeId = helper.getNextNode(context.attributes.currentNode, reply);
-
-        // error in node data
-        if (nextNodeId == -1)
-        {
-            context.handler.state = states.STARTMODE;
-
-            // the current node was not found in the nodes array
-            // this is due to the current node in the nodes array having a yes / no node id for a node that does not exist
-            context.response.speak(nodeNotFoundMessage);
-        }
-
-        // get the speech for the child node
-        let message = helper.getSpeechForNode(nextNodeId);
-
-        // have we made a decision
-        if (helper.isAnswerNode(nextNodeId) === true) {
-
-            // set the game state to description mode
-            context.handler.state = states.DESCRIPTIONMODE;
-
-            // append the play again prompt to the decision and speak it
-            message = decisionMessage + ' ' + message + ' ,' + playAgainMessage;
-        }
-
-        // set the current node to next node we want to go to
-        context.attributes.currentNode = nextNodeId;
-
-        context.response.speak(message).listen(message);
-    },
-
-    // gets the description for the given node id
-    getDescriptionForNode: function (nodeId) {
-
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].node == nodeId) {
-                return nodes[i].description;
+            switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+            case "ER_SUCCESS_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+                    "isValidated": true
+                };
+                break;
+            case "ER_SUCCESS_NO_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].value,
+                    "isValidated":false
+                };
+                break;
             }
+        } else {
+            slotValues[name] = {
+                "synonym": filledSlots[item].value,
+                "resolved": filledSlots[item].value,
+                "isValidated": false
+            };
         }
-        return descriptionNotFoundMessage + nodeId;
-    },
+    },this);
 
-    // returns the speech for the provided node id
-    getSpeechForNode: function (nodeId) {
+    //console.log("slot values: "+JSON.stringify(slotValues));
+    return slotValues;
+}
 
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].node == nodeId) {
-                return nodes[i].message;
-            }
-        }
-        return speechNotFoundMessage + nodeId;
-    },
+// This function delegates multi-turn dialogs to Alexa.
+// For more information about dialog directives see the link below.
+// https://developer.amazon.com/docs/custom-skills/dialog-interface-reference.html
+function delegateSlotCollection() {
+    console.log("in delegateSlotCollection");
+    console.log("current dialogState: " + this.event.request.dialogState);
 
-    // checks to see if this node is an choice node or a decision node
-    isAnswerNode: function (nodeId) {
+    if (this.event.request.dialogState === "STARTED") {
+        console.log("in STARTED");
+        console.log(JSON.stringify(this.event));
+        let updatedIntent = this.event.request.intent;
+        // optionally pre-fill slots: update the intent object with slot values
+        // for which you have defaults, then return Dialog.Delegate with this
+        // updated intent in the updatedIntent property
 
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].node == nodeId) {
-                if (nodes[i].yes === 0 && nodes[i].no === 0) {
-                    return true;
+        disambiguateSlot.call(this);
+        console.log("disambiguated: " + JSON.stringify(this.event));
+        this.emit(":delegate", updatedIntent);
+    } else if (this.event.request.dialogState !== "COMPLETED") {
+        console.log("in not completed");
+        let updatedIntent = this.event.request.intent;
+        //console.log(JSON.stringify(this.event));
+
+        disambiguateSlot.call(this);
+        this.emit(":delegate", updatedIntent);
+    } else {
+        console.log("in completed");
+        //console.log("returning: "+ JSON.stringify(this.event.request.intent));
+        // Dialog is now complete and all required slots should be filled,
+        // so call your normal intent handler.
+        return this.event.request.intent.slots;
+    }
+    return null;
+}
+
+// If the user said a synonym that maps to more than one value, we need to ask
+// the user for clarification. Disambiguate slot will loop through all slots and
+// elicit confirmation for the first slot it sees that resolves to more than
+// one value.
+function disambiguateSlot() {
+    let currentIntent = this.event.request.intent;
+    let prompt = "";
+    Object.keys(this.event.request.intent.slots).forEach(function (slotName) {
+        let currentSlot = currentIntent.slots[slotName];
+        // let slotValue = slotHasValue(this.event.request, currentSlot.name);
+        if (currentSlot.confirmationStatus !== "CONFIRMED" &&
+            currentSlot.resolutions &&
+            currentSlot.resolutions.resolutionsPerAuthority[0]) {
+
+            if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_MATCH") {
+                // if there's more than one value that means we have a synonym that
+                // mapped to more than one value. So we need to ask the user for
+                // clarification. For example if the user said "mini dog", and
+                // "mini" is a synonym for both "small" and "tiny" then ask "Did you
+                // want a small or tiny dog?" to get the user to tell you
+                // specifically what type mini dog (small mini or tiny mini).
+                if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
+                    prompt = "Which would you like";
+                    let size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
+                    currentSlot.resolutions.resolutionsPerAuthority[0].values.forEach(function (element, index, arr) {
+                        prompt += ` ${(index === size - 1) ? " or" : " "} ${element.value.name}`;
+                    });
+
+                    prompt += "?";
+                    let reprompt = prompt;
+                    // In this case we need to disambiguate the value that they
+                    // provided to us because it resolved to more than one thing so
+                    // we build up our prompts and then emit elicitSlot.
+                    this.emit(":elicitSlot", currentSlot.name, prompt, reprompt);
+                }
+            } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_NO_MATCH") {
+                // Here is where you'll want to add instrumentation to your code
+                // so you can capture synonyms that you haven't defined.
+                console.log("NO MATCH FOR: ", currentSlot.name, " value: ", currentSlot.value);
+
+                if (REQUIRED_SLOTS.indexOf(currentSlot.name) > -1) {
+                    prompt = "What " + currentSlot.name + " are you looking for";
+                    this.emit(":elicitSlot", currentSlot.name, prompt, prompt);
                 }
             }
         }
+    }, this);
+}
+
+// Given the request an slot name, slotHasValue returns the slot value if one
+// was given for `slotName`. Otherwise returns false.
+function slotHasValue(request, slotName) {
+
+    let slot = request.intent.slots[slotName];
+
+    // uncomment if you want to see the request
+    // console.log("request = "+JSON.stringify(request));
+    let slotValue;
+
+    // if we have a slot, get the text and store it into speechOutput
+    if (slot && slot.value) {
+        // we have a value in the slot
+        slotValue = slot.value.toLowerCase();
+        return slotValue;
+    } else {
+        // we didn't get a value in the slot.
         return false;
-    },
-
-    // gets the next node to traverse to based on the yes no response
-    getNextNode: function (nodeId, yesNo) {
-        for (let i = 0; i < nodes.length; i++) {
-            if (nodes[i].node == nodeId) {
-                if (yesNo == "yes") {
-                    return nodes[i].yes;
-                }
-                return nodes[i].no;
-            }
-        }
-        // error condition, didnt find a matching node id. Cause will be a yes / no entry in the array but with no corrosponding array entry
-        return -1;
-    },
-
-    // Recursively walks the node tree looking for nodes already visited
-    // This method could be changed if you want to implement another type of checking mechanism
-    // This should be run on debug builds only not production
-    // returns false if node tree path does not contain any previously visited nodes, true if it finds one
-    debugFunction_walkNode: function (nodeId) {
-
-        // console.log("Walking node: " + nodeId);
-
-        if( helper.isAnswerNode(nodeId) === true) {
-            // found an answer node - this path to this node does not contain a previously visted node
-            // so we will return without recursing further
-
-            // console.log("Answer node found");
-             return false;
-        }
-
-        // mark this question node as visited
-        if( helper.debugFunction_AddToVisited(nodeId) === false)
-        {
-            // node was not added to the visited list as it already exists, this indicates a duplicate path in the tree
-            return true;
-        }
-
-        // console.log("Recursing yes path");
-        let yesNode = helper.getNextNode(nodeId, "yes");
-        let duplicatePathHit = helper.debugFunction_walkNode(yesNode);
-
-        if( duplicatePathHit === true){
-            return true;
-        }
-
-        // console.log("Recursing no");
-        let noNode = helper.getNextNode(nodeId, "no");
-        duplicatePathHit = helper.debugFunction_walkNode(noNode);
-
-        if( duplicatePathHit === true){
-            return true;
-        }
-
-        // the paths below this node returned no duplicates
-        return false;
-    },
-
-    // checks to see if this node has previously been visited
-    // if it has it will be set to 1 in the array and we return false (exists)
-    // if it hasnt we set it to 1 and return true (added)
-    debugFunction_AddToVisited: function (nodeId) {
-
-        if (visited[nodeId] === 1) {
-            // node previously added - duplicate exists
-            // console.log("Node was previously visited - duplicate detected");
-            return false;
-        }
-
-        // was not found so add it as a visited node
-        visited[nodeId] = 1;
-        return true;
     }
-};
+}

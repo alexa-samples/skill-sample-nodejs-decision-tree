@@ -4,49 +4,84 @@
       "invocationName": "decision tree",
       "intents": [
         {
-          "name": "AMAZON.YesIntent"
+          "name": "AMAZON.CancelIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.NoIntent"
-        },
-        {
-          "name": "AMAZON.HelpIntent"
+          "name": "AMAZON.HelpIntent",
+          "samples": []
         },
         {
           "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "CouchPotatoIntent",
           "samples": [
-            "stop",
-            "off",
-            "shut up"
+            "couch potato",
+            "lazy"
           ]
         },
         {
-          "name": "AMAZON.CancelIntent"
-        },
-        {
-          "name": "AMAZON.StartOverIntent",
-          "samples": [
-            "start over",
-            "restart",
-            "start again",
-            "play again"
-          ]
-        },
-        {
-          "name": "DescriptionIntent",
+          "name": "RecommendationIntent",
           "slots": [
             {
-              "name": "Description",
-              "type": "descriptionType"
+              "name": "salaryImportance",
+              "type": "salaryImportanceType",
+              "samples": [
+                "{I_Want} to be {salaryImportance}",
+                "{salaryImportance}"
+              ]
+            },
+            {
+              "name": "personality",
+              "type": "personalityType",
+              "samples": [
+                "{I_Am} {article} {personality}",
+                "{personality}"
+              ]
+            },
+            {
+              "name": "preferredSpecies",
+              "type": "preferredSpeciesType",
+              "samples": [
+                "{I_Like} {preferredSpecies}",
+                "{preferredSpecies}"
+              ]
+            },
+            {
+              "name": "bloodTolerance",
+              "type": "bloodToleranceType",
+              "samples": [
+                "I would {bloodTolerance}",
+                "{bloodTolerance}"
+              ]
+            },
+            {
+              "name": "I_Like",
+              "type": "iSubjectType"
+            },
+            {
+              "name": "I_Want",
+              "type": "iSubjectType"
+            },
+            {
+              "name": "article",
+              "type": "articleType"
+            },
+            {
+              "name": "I_Am",
+              "type": "IAmType"
             }
           ],
           "samples": [
-            "{Description} please",
-            "please {Description}",
-            "{Description}",
-            "can you {Description}",
-            "tell me about that",
-            "description please"
+            "recommend a job",
+            "{I_Like} {preferredSpecies}",
+            "{I_Like} {bloodTolerance}",
+            "{I_Am} {article} {personality}",
+            "{I_Want} to be {salaryImportance}",
+            "to recommend a job",
+            "start my career"
           ]
         }
       ],
@@ -55,23 +90,292 @@
           "values": [
             {
               "name": {
-                "value": "tell me more"
+                "value": "a",
+                "synonyms": []
               }
             },
             {
               "name": {
-                "value": "describe"
-              }
-            },
-            {
-              "name": {
-                "value": "describe it"
+                "value": "an",
+                "synonyms": []
               }
             }
           ],
-          "name": "descriptionType"
+          "name": "articleType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "low",
+                "synonyms": [
+                  "yuck",
+                  "no way",
+                  "gross",
+                  "I can't stand it",
+                  "can't stand it",
+                  "throw up when I see it",
+                  "scream"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "high",
+                "synonyms": [
+                  "I like blood",
+                  "doesn't bother me",
+                  "blood is natural",
+                  "shrug"
+                ]
+              }
+            }
+          ],
+          "name": "bloodToleranceType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "I am",
+                "synonyms": []
+              }
+            }
+          ],
+          "name": "IAmType"
+        },
+        {
+          "values": [
+            {
+              "id": "true",
+              "name": {
+                "value": "positive",
+                "synonyms": [
+                  "I want",
+                  "I prefer",
+                  "I really like",
+                  "I love",
+                  "I like"
+                ]
+              }
+            },
+            {
+              "id": "false",
+              "name": {
+                "value": "negative",
+                "synonyms": [
+                  "I don't want",
+                  "I really don't like",
+                  "I don't like",
+                  "I hate"
+                ]
+              }
+            }
+          ],
+          "name": "iSubjectType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "extrovert",
+                "synonyms": [
+                  "social butterfly",
+                  "love to party"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "introvert",
+                "synonyms": [
+                  "to be alone",
+                  "misunderstood"
+                ]
+              }
+            }
+          ],
+          "name": "personalityType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "animals",
+                "synonyms": [
+                  "dogs",
+                  "cats",
+                  "birds",
+                  "turtles",
+                  "puppies",
+                  "kittens",
+                  "elephants"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "people",
+                "synonyms": [
+                  "men",
+                  "women",
+                  "kids",
+                  "humans"
+                ]
+              }
+            }
+          ],
+          "name": "preferredSpeciesType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "unimportant",
+                "synonyms": [
+                  "money is evil",
+                  "money is not important",
+                  "not a sell out",
+                  "nope",
+                  "don't care about money"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "somewhat",
+                "synonyms": [
+                  "just enough",
+                  "somewhat important",
+                  "not top priority",
+                  "support my family"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "very",
+                "synonyms": [
+                  "high salary",
+                  "filthy rich",
+                  "billionaire",
+                  "important",
+                  "nothing more important"
+                ]
+              }
+            }
+          ],
+          "name": "salaryImportanceType"
         }
       ]
-    }
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "RecommendationIntent",
+          "confirmationRequired": false,
+          "slots": [
+            {
+              "name": "salaryImportance",
+              "type": "salaryImportanceType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-salaryImportance"
+              }
+            },
+            {
+              "name": "personality",
+              "type": "personalityType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-personality"
+              }
+            },
+            {
+              "name": "preferredSpecies",
+              "type": "preferredSpeciesType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-preferredSpecies"
+              }
+            },
+            {
+              "name": "bloodTolerance",
+              "type": "bloodToleranceType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-bloodTolerance"
+              }
+            },
+            {
+              "name": "I_Like",
+              "type": "iSubjectType",
+              "elicitationRequired": false,
+              "confirmationRequired": false
+            },
+            {
+              "name": "I_Want",
+              "type": "iSubjectType",
+              "elicitationRequired": false,
+              "confirmationRequired": false
+            },
+            {
+              "name": "article",
+              "type": "articleType",
+              "elicitationRequired": false,
+              "confirmationRequired": false
+            },
+            {
+              "name": "I_Am",
+              "type": "IAmType",
+              "elicitationRequired": false,
+              "confirmationRequired": false
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-salaryImportance",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which phrase best describes your thoughts about money, there's nothing more important, not top priority, or I don't care about money."
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-personality",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Would you say that you are an introvert or an extrovert?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-preferredSpecies",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Between animals and people which do you prefer?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-bloodTolerance",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "If you saw blood would you scream or shrug?"
+          }
+        ]
+      }
+    ]
   }
 }
