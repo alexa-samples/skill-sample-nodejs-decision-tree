@@ -25,22 +25,22 @@ const Alexa = require("alexa-sdk");
 // For detailed tutorial on how to make an Alexa skill,
 // please visit us at http://alexa.design/build
 
-var handlers = {
+let handlers = {
     "LaunchRequest": function () {
         console.log("in LaunchRequest");
         this.response.speak("Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?");
         this.response.listen("Do you want a career or to be a couch potato?");
         this.emit(":responseReady");
     },
-    "CouchPotatoIntent" : function() {
+    "CouchPotatoIntent": function () {
 
         this.response.speak("You don't want to start your career? Have fun wasting away on the couch.");
         this.emit(":responseReady");
     },
-    "RecommendationIntent" : function () {
+    "RecommendationIntent": function () {
         // delegate to Alexa to collect all the required slots
 
-        var filledSlots = delegateSlotCollection.call(this);
+        let filledSlots = delegateSlotCollection.call(this);
 
         if (!filledSlots) {
             return;
@@ -48,50 +48,50 @@ var handlers = {
 
         console.log("filled slots: " + JSON.stringify(filledSlots));
         // at this point, we know that all required slots are filled.
-        var slotValues = getSlotValues(filledSlots);
+        let slotValues = getSlotValues(filledSlots);
 
         console.log(JSON.stringify(slotValues));
 
-        var key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
-        var occupation = options[slotsToOptionsMap[key]];
+        let key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
+        let occupation = options[slotsToOptionsMap[key]];
 
-        console.log("look up key: ", key,  "object: ", occupation);
+        console.log("look up key: ", key, "object: ", occupation);
 
-        var speechOutput = "So you want to be " + slotValues.salaryImportance.resolved +
-                           ". You are an " + slotValues.personality.resolved +
-                           ", you like " + slotValues.preferredSpecies.resolved +
-                           "  and you " + (slotValues.bloodTolerance.resolved === "high" ? "can" : "can't" ) +
-                           " tolerate blood " +
-                           ". You should consider being a " + occupation.name;
+        let speechOutput = "So you want to be " + slotValues.salaryImportance.resolved +
+                ". You are an " + slotValues.personality.resolved +
+                ", you like " + slotValues.preferredSpecies.resolved +
+                "  and you " + (slotValues.bloodTolerance.resolved === "high" ? "can" : "can't" ) +
+                " tolerate blood " +
+                ". You should consider being a " + occupation.name;
 
         console.log("Speech output: ", speechOutput);
         this.response.speak(speechOutput);
         this.emit(":responseReady");
 
     },
-    "SessionEndedRequest" : function() {
+    "SessionEndedRequest": function () {
         console.log("Session ended with reason: " + this.event.request.reason);
     },
-    "AMAZON.StopIntent" : function() {
+    "AMAZON.StopIntent": function () {
         this.response.speak("Bye");
         this.emit(":responseReady");
     },
-    "AMAZON.HelpIntent" : function() {
+    "AMAZON.HelpIntent": function () {
         this.response.speak("This is Decision Tree. I can help you find the perfect job. " +
-             "You can say, recommend a job.").listen("Would you like a career or do you want to be a couch potato?");
+           "You can say, recommend a job.").listen("Would you like a career or do you want to be a couch potato?");
         this.emit(":responseReady");
     },
-    "AMAZON.CancelIntent" : function() {
+    "AMAZON.CancelIntent": function () {
         this.response.speak("Bye");
         this.emit(":responseReady");
     },
-    "Unhandled" : function() {
+    "Unhandled": function () {
         this.response.speak("Sorry, I didn't get that. You can try: 'alexa, tell Decision Tree to" +
             " recommend a job.'");
     }
 };
 
-exports.handler = function(event, context) {
+exports.handler = function (event, context) {
 
     // Each time your lambda function is triggered from your skill,
     // the event's JSON will be logged. Check Cloud Watch to see the event.
@@ -99,7 +99,7 @@ exports.handler = function(event, context) {
     console.log("====================");
     console.log("REQUEST: " + JSON.stringify(event));
     console.log("====================");
-    var alexa = Alexa.handler(event, context);
+    let alexa = Alexa.handler(event, context);
 
     // Part 3: Task 4
     // alexa.dynamoDBTableName = 'petMatchTable';
@@ -143,27 +143,27 @@ const slotsToOptionsMap = {
 };
 
 const options = [
-    {  "name": "Actor", "description": "" },
-    {  "name": "Animal Control Worker", "description": "" },
-    {  "name": "Animal Shelter Manager", "description": "" },
-    {  "name": "Artist", "description": "" },
-    {  "name": "Court Reporter", "description": "" },
-    {  "name": "Doctor", "description": "" },
-    {  "name": "Geoscientist", "description": "" },
-    {  "name": "Investment Banker", "description": "" },
-    {  "name": "Lighthouse Keeper", "description": "" },
-    {  "name": "Marine Ecologist", "description": "" },
-    {  "name": "Park Naturalist", "description": "" },
-    {  "name": "Pet Groomer", "description": "" },
-    {  "name": "Physical Therapist", "description": "" },
-    {  "name": "Security Guard", "description": "" },
-    {  "name": "Social Media Engineer", "description": "" },
-    {  "name": "Software Engineer", "description": "" },
-    {  "name": "Teacher", "description": "" },
-    {  "name": "Veterinary", "description": "" },
-    {  "name": "Veterinary Dentist", "description": "" },
-    {  "name": "Zookeeper", "description": "" },
-    {  "name": "Zoologist", "description": "" }
+    {"name": "Actor", "description": ""},
+    {"name": "Animal Control Worker", "description": ""},
+    {"name": "Animal Shelter Manager", "description": ""},
+    {"name": "Artist", "description": ""},
+    {"name": "Court Reporter", "description": ""},
+    {"name": "Doctor", "description": ""},
+    {"name": "Geoscientist", "description": ""},
+    {"name": "Investment Banker", "description": ""},
+    {"name": "Lighthouse Keeper", "description": ""},
+    {"name": "Marine Ecologist", "description": ""},
+    {"name": "Park Naturalist", "description": ""},
+    {"name": "Pet Groomer", "description": ""},
+    {"name": "Physical Therapist", "description": ""},
+    {"name": "Security Guard", "description": ""},
+    {"name": "Social Media Engineer", "description": ""},
+    {"name": "Software Engineer", "description": ""},
+    {"name": "Teacher", "description": ""},
+    {"name": "Veterinary", "description": ""},
+    {"name": "Veterinary Dentist", "description": ""},
+    {"name": "Zookeeper", "description": ""},
+    {"name": "Zoologist", "description": ""}
 ];
 
 // ***********************************
@@ -176,7 +176,7 @@ const options = [
 // ** Dialog Management
 // ***********************************
 
-function getSlotValues (filledSlots) {
+function getSlotValues(filledSlots) {
     //given event.request.intent.slots, a slots values object so you have
     //what synonym the person said - .synonym
     //what that resolved to - .resolved
@@ -184,42 +184,46 @@ function getSlotValues (filledSlots) {
     let slotValues = {};
 
     console.log("The filled slots: " + JSON.stringify(filledSlots));
-    Object.keys(filledSlots).forEach(function(item) {
-        //console.log("item in filledSlots: "+JSON.stringify(filledSlots[item]));
-        var name = filledSlots[item].name;
+    Object.keys(filledSlots).forEach(function (item) {
+
+        // console.log("item in filledSlots: "+JSON.stringify(filledSlots[item]));
+
+        let name = filledSlots[item].name;
         //console.log("name: "+name);
-        if(filledSlots[item]&&
-           filledSlots[item].resolutions &&
-           filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-           filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-           filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code ) {
+
+        if (filledSlots[item] &&
+             filledSlots[item].resolutions &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+             filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
 
             switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-                case "ER_SUCCESS_MATCH":
-                    slotValues[name] = {
-                        "synonym": filledSlots[item].value,
-                        "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
-                        "isValidated": true
-                    };
-                    break;
-                case "ER_SUCCESS_NO_MATCH":
-                    slotValues[name] = {
-                        "synonym": filledSlots[item].value,
-                        "resolved": filledSlots[item].value,
-                        "isValidated":false
-                    };
-                    break;
-                }
-            } else {
+            case "ER_SUCCESS_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+                    "isValidated": true
+                };
+                break;
+            case "ER_SUCCESS_NO_MATCH":
                 slotValues[name] = {
                     "synonym": filledSlots[item].value,
                     "resolved": filledSlots[item].value,
-                    "isValidated": false
+                    "isValidated":false
                 };
+                break;
             }
-        },this);
-        //console.log("slot values: "+JSON.stringify(slotValues));
-        return slotValues;
+        } else {
+            slotValues[name] = {
+                "synonym": filledSlots[item].value,
+                "resolved": filledSlots[item].value,
+                "isValidated": false
+            };
+        }
+    },this);
+
+    //console.log("slot values: "+JSON.stringify(slotValues));
+    return slotValues;
 }
 
 // This function delegates multi-turn dialogs to Alexa.
@@ -232,7 +236,7 @@ function delegateSlotCollection() {
     if (this.event.request.dialogState === "STARTED") {
         console.log("in STARTED");
         console.log(JSON.stringify(this.event));
-        var updatedIntent=this.event.request.intent;
+        let updatedIntent = this.event.request.intent;
         // optionally pre-fill slots: update the intent object with slot values
         // for which you have defaults, then return Dialog.Delegate with this
         // updated intent in the updatedIntent property
@@ -242,6 +246,7 @@ function delegateSlotCollection() {
         this.emit(":delegate", updatedIntent);
     } else if (this.event.request.dialogState !== "COMPLETED") {
         console.log("in not completed");
+        let updatedIntent = this.event.request.intent;
         //console.log(JSON.stringify(this.event));
 
         disambiguateSlot.call(this);
@@ -262,26 +267,26 @@ function delegateSlotCollection() {
 // one value.
 function disambiguateSlot() {
     let currentIntent = this.event.request.intent;
-
-    Object.keys(this.event.request.intent.slots).forEach(function(slotName) {
-        let currentSlot = this.event.request.intent.slots[slotName];
-        let slotValue = slotHasValue(this.event.request, currentSlot.name);
+    let prompt = "";
+    Object.keys(this.event.request.intent.slots).forEach(function (slotName) {
+        let currentSlot = currentIntent.slots[slotName];
+        // let slotValue = slotHasValue(this.event.request, currentSlot.name);
         if (currentSlot.confirmationStatus !== "CONFIRMED" &&
             currentSlot.resolutions &&
             currentSlot.resolutions.resolutionsPerAuthority[0]) {
 
-            if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code == "ER_SUCCESS_MATCH") {
+            if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_MATCH") {
                 // if there's more than one value that means we have a synonym that
                 // mapped to more than one value. So we need to ask the user for
                 // clarification. For example if the user said "mini dog", and
                 // "mini" is a synonym for both "small" and "tiny" then ask "Did you
                 // want a small or tiny dog?" to get the user to tell you
                 // specifically what type mini dog (small mini or tiny mini).
-                if ( currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
-                    let prompt = "Which would you like";
+                if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
+                    prompt = "Which would you like";
                     let size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
-                    currentSlot.resolutions.resolutionsPerAuthority[0].values.forEach(function(element, index, arr) {
-                        prompt += ` ${(index == size -1) ? " or" : " "} ${element.value.name}`;
+                    currentSlot.resolutions.resolutionsPerAuthority[0].values.forEach(function (element, index, arr) {
+                        prompt += ` ${(index === size - 1) ? " or" : " "} ${element.value.name}`;
                     });
 
                     prompt += "?";
@@ -291,13 +296,13 @@ function disambiguateSlot() {
                     // we build up our prompts and then emit elicitSlot.
                     this.emit(":elicitSlot", currentSlot.name, prompt, reprompt);
                 }
-            } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code == "ER_SUCCESS_NO_MATCH") {
+            } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_NO_MATCH") {
                 // Here is where you'll want to add instrumentation to your code
                 // so you can capture synonyms that you haven't defined.
                 console.log("NO MATCH FOR: ", currentSlot.name, " value: ", currentSlot.value);
 
                 if (REQUIRED_SLOTS.indexOf(currentSlot.name) > -1) {
-                    let prompt = "What " + currentSlot.name + " are you looking for";
+                    prompt = "What " + currentSlot.name + " are you looking for";
                     this.emit(":elicitSlot", currentSlot.name, prompt, prompt);
                 }
             }
@@ -324,15 +329,4 @@ function slotHasValue(request, slotName) {
         // we didn't get a value in the slot.
         return false;
     }
-}
-
-// ***********************************
-// ** Misc
-// ***********************************
-
-function randomPhrase(array) {
-    // the argument is an array [] of words or phrases
-    var i = 0;
-    i = Math.floor(Math.random() * array.length);
-    return(array[i]); // If you like one liners this will also do: return(array[Math.floor(Math.random() * array.length)]);
 }
