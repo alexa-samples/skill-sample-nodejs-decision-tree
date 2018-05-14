@@ -1,6 +1,6 @@
 /**
 
-    Copyright 2017 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+    Copyright 2017-2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
     Licensed under the Amazon Software License (the "License").
     You may not use this file except in compliance with the License.
     A copy of the License is located at
@@ -19,315 +19,297 @@
     is mapped to two slot values.
  **/
 
+/* eslint-disable  func-names */
+/* eslint-disable  no-restricted-syntax */
+/* eslint-disable  no-loop-func */
+/* eslint-disable  consistent-return */
+/* eslint-disable  no-console */
 
-"use strict";
-const Alexa = require("alexa-sdk");
+const Alexa = require('ask-sdk-core');
 
-// For detailed tutorial on how to make an Alexa skill,
-// please visit us at http://alexa.design/build
+/* INTENT HANDLERS */
 
-let handlers = {
-    "LaunchRequest": function () {
-        console.log("in LaunchRequest");
-        this.response.speak("Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?");
-        this.response.listen("Do you want a career or to be a couch potato?");
-        this.emit(":responseReady");
-    },
-    "CouchPotatoIntent": function () {
+const LaunchRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?')
+      .reprompt('Do you want a career or to be a couch potato?')
+      .getResponse();
+  },
+};
 
-        this.response.speak("You don't want to start your career? Have fun wasting away on the couch.");
-        this.emit(":responseReady");
-    },
-    "RecommendationIntent": function () {
-        // delegate to Alexa to collect all the required slots
+const CouchPotatoIntent = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
 
-        let filledSlots = delegateSlotCollection.call(this);
+    return request.type === 'IntentRequest' 
+      && request.intent.name === 'CouchPotatoIntent';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('You don\'t want to start your career? Have fun wasting away on the couch.')
+      .getResponse();
+  },
+};
 
-        if (!filledSlots) {
-            return;
+const InProgressRecommendationIntent = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'RecommendationIntent'
+      && request.dialogState !== 'COMPLETED';
+  },
+  handle(handlerInput) {
+    const currentIntent = handlerInput.requestEnvelope.request.intent;
+    let prompt = '';
+
+    for (const slotName of Object.keys(handlerInput.requestEnvelope.request.intent.slots)) {
+      const currentSlot = currentIntent.slots[slotName];
+      if (currentSlot.confirmationStatus !== 'CONFIRMED'
+                && currentSlot.resolutions
+                && currentSlot.resolutions.resolutionsPerAuthority[0]) {
+        if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_MATCH') {
+          if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
+            prompt = 'Which would you like';
+            const size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
+
+            currentSlot.resolutions.resolutionsPerAuthority[0].values
+              .forEach((element, index) => {
+                prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element.value.name}`;
+              });
+
+            prompt += '?';
+
+            return handlerInput.responseBuilder
+              .speak(prompt)
+              .reprompt(prompt)
+              .addElicitSlotDirective(currentSlot.name)
+              .getResponse();
+          }
+        } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_NO_MATCH') {
+          if (requiredSlots.indexOf(currentSlot.name) > -1) {
+            prompt = `What ${currentSlot.name} are you looking for`;
+
+            return handlerInput.responseBuilder
+              .speak(prompt)
+              .reprompt(prompt)
+              .addElicitSlotDirective(currentSlot.name)
+              .getResponse();
+          }
         }
-
-        console.log("filled slots: " + JSON.stringify(filledSlots));
-        // at this point, we know that all required slots are filled.
-        let slotValues = getSlotValues(filledSlots);
-
-        console.log(JSON.stringify(slotValues));
-
-        let key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
-        let occupation = options[slotsToOptionsMap[key]];
-
-        console.log("look up key: ", key, "object: ", occupation);
-
-        let speechOutput = "So you want to be " + slotValues.salaryImportance.resolved +
-                ". You are an " + slotValues.personality.resolved +
-                ", you like " + slotValues.preferredSpecies.resolved +
-                "  and you " + (slotValues.bloodTolerance.resolved === "high" ? "can" : "can't" ) +
-                " tolerate blood " +
-                ". You should consider being a " + occupation.name;
-
-        console.log("Speech output: ", speechOutput);
-        this.response.speak(speechOutput);
-        this.emit(":responseReady");
-
-    },
-    "SessionEndedRequest": function () {
-        console.log("Session ended with reason: " + this.event.request.reason);
-    },
-    "AMAZON.StopIntent": function () {
-        this.response.speak("Bye");
-        this.emit(":responseReady");
-    },
-    "AMAZON.HelpIntent": function () {
-        this.response.speak("This is Decision Tree. I can help you find the perfect job. " +
-           "You can say, recommend a job.").listen("Would you like a career or do you want to be a couch potato?");
-        this.emit(":responseReady");
-    },
-    "AMAZON.CancelIntent": function () {
-        this.response.speak("Bye");
-        this.emit(":responseReady");
-    },
-    "Unhandled": function () {
-        this.response.speak("Sorry, I didn't get that. You can try: 'alexa, tell Decision Tree to" +
-            " recommend a job.'");
+      }
     }
+
+    return handlerInput.responseBuilder
+      .addDelegateDirective(currentIntent)
+      .getResponse();
+  },
 };
 
-exports.handler = function (event, context) {
+const CompletedRecommendationIntent = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
 
-    // Each time your lambda function is triggered from your skill,
-    // the event's JSON will be logged. Check Cloud Watch to see the event.
-    // You can copy the log from Cloud Watch and use it for testing.
-    console.log("====================");
-    console.log("REQUEST: " + JSON.stringify(event));
-    console.log("====================");
-    let alexa = Alexa.handler(event, context);
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'RecommendationIntent'
+      && request.dialogState === 'COMPLETED';
+  },
+  handle(handlerInput) {
+    const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
 
-    // Part 3: Task 4
-    // alexa.dynamoDBTableName = 'petMatchTable';
-    alexa.registerHandlers(handlers);
-    alexa.execute();
+    const slotValues = getSlotValues(filledSlots);
+
+    const key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
+    const occupation = options[slotsToOptionsMap[key]];
+
+    const speechOutput = `So you want to be ${slotValues.salaryImportance.resolved
+    }. You are an ${slotValues.personality.resolved
+    }, you like ${slotValues.preferredSpecies.resolved
+    }  and you ${slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"
+    } tolerate blood ` +
+            `. You should consider being a ${occupation.name}`;
+
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .getResponse();
+  },
+};
+
+const HelpHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest' 
+      && request.intent.name === 'AMAZON.HelpIntent';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.')
+      .reprompt('Would you like a career or do you want to be a couch potato?')
+      .getResponse();
+  },
+};
+
+const ExitHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest'
+      && (request.intent.name === 'AMAZON.CancelIntent'
+        || request.intent.name === 'AMAZON.StopIntent');
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('Bye')
+      .getResponse();
+  },
+};
+
+const SessionEndedRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+  },
+  handle(handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+
+    return handlerInput.responseBuilder.getResponse();
+  },
 };
 
 
-const REQUIRED_SLOTS = [
-    "preferredSpecies",
-    "bloodTolerance",
-    "personality",
-    "salaryImportance"
+const ErrorHandler = {
+  canHandle() {
+    return true;
+  },
+  handle(handlerInput, error) {
+    console.log(`Error handled: ${error.message}`);
+
+    return handlerInput.responseBuilder
+      .speak('Sorry, I can\'t understand the command. Please say again.')
+      .reprompt('Sorry, I can\'t understand the command. Please say again.')
+      .getResponse();
+  },
+};
+
+/* CONSTANTS */
+
+const skillBuilder = Alexa.SkillBuilders.custom();
+
+const requiredSlots = [
+  'preferredSpecies',
+  'bloodTolerance',
+  'personality',
+  'salaryImportance',
 ];
 
 const slotsToOptionsMap = {
-    "unimportant-introvert-low-animals": 20,
-    "unimportant-introvert-low-people": 8,
-    "unimportant-introvert-high-animals": 1,
-    "unimportant-introvert-high-people": 4,
-    "unimportant-extrovert-low-animals": 10,
-    "unimportant-extrovert-low-people": 3,
-    "unimportant-extrovert-high-animals": 11,
-    "unimportant-extrovert-high-people": 13,
-    "somewhat-introvert-low-animals": 20,
-    "somewhat-introvert-low-people": 6,
-    "somewhat-introvert-high-animals": 19,
-    "somewhat-introvert-high-people": 14,
-    "somewhat-extrovert-low-animals": 2,
-    "somewhat-extrovert-low-people": 12,
-    "somewhat-extrovert-high-animals": 17,
-    "somewhat-extrovert-high-people": 16,
-    "very-introvert-low-animals": 9,
-    "very-introvert-low-people": 15,
-    "very-introvert-high-animals": 17,
-    "very-introvert-high-people": 7,
-    "very-extrovert-low-animals": 17,
-    "very-extrovert-low-people": 0,
-    "very-extrovert-high-animals": 1,
-    "very-extrovert-high-people": 5
+  'unimportant-introvert-low-animals': 20,
+  'unimportant-introvert-low-people': 8,
+  'unimportant-introvert-high-animals': 1,
+  'unimportant-introvert-high-people': 4,
+  'unimportant-extrovert-low-animals': 10,
+  'unimportant-extrovert-low-people': 3,
+  'unimportant-extrovert-high-animals': 11,
+  'unimportant-extrovert-high-people': 13,
+  'somewhat-introvert-low-animals': 20,
+  'somewhat-introvert-low-people': 6,
+  'somewhat-introvert-high-animals': 19,
+  'somewhat-introvert-high-people': 14,
+  'somewhat-extrovert-low-animals': 2,
+  'somewhat-extrovert-low-people': 12,
+  'somewhat-extrovert-high-animals': 17,
+  'somewhat-extrovert-high-people': 16,
+  'very-introvert-low-animals': 9,
+  'very-introvert-low-people': 15,
+  'very-introvert-high-animals': 17,
+  'very-introvert-high-people': 7,
+  'very-extrovert-low-animals': 17,
+  'very-extrovert-low-people': 0,
+  'very-extrovert-high-animals': 1,
+  'very-extrovert-high-people': 5,
 };
 
 const options = [
-    {"name": "Actor", "description": ""},
-    {"name": "Animal Control Worker", "description": ""},
-    {"name": "Animal Shelter Manager", "description": ""},
-    {"name": "Artist", "description": ""},
-    {"name": "Court Reporter", "description": ""},
-    {"name": "Doctor", "description": ""},
-    {"name": "Geoscientist", "description": ""},
-    {"name": "Investment Banker", "description": ""},
-    {"name": "Lighthouse Keeper", "description": ""},
-    {"name": "Marine Ecologist", "description": ""},
-    {"name": "Park Naturalist", "description": ""},
-    {"name": "Pet Groomer", "description": ""},
-    {"name": "Physical Therapist", "description": ""},
-    {"name": "Security Guard", "description": ""},
-    {"name": "Social Media Engineer", "description": ""},
-    {"name": "Software Engineer", "description": ""},
-    {"name": "Teacher", "description": ""},
-    {"name": "Veterinary", "description": ""},
-    {"name": "Veterinary Dentist", "description": ""},
-    {"name": "Zookeeper", "description": ""},
-    {"name": "Zoologist", "description": ""}
+  { name: 'Actor', description: '' },
+  { name: 'Animal Control Worker', description: '' },
+  { name: 'Animal Shelter Manager', description: '' },
+  { name: 'Artist', description: '' },
+  { name: 'Court Reporter', description: '' },
+  { name: 'Doctor', description: '' },
+  { name: 'Geoscientist', description: '' },
+  { name: 'Investment Banker', description: '' },
+  { name: 'Lighthouse Keeper', description: '' },
+  { name: 'Marine Ecologist', description: '' },
+  { name: 'Park Naturalist', description: '' },
+  { name: 'Pet Groomer', description: '' },
+  { name: 'Physical Therapist', description: '' },
+  { name: 'Security Guard', description: '' },
+  { name: 'Social Media Engineer', description: '' },
+  { name: 'Software Engineer', description: '' },
+  { name: 'Teacher', description: '' },
+  { name: 'Veterinary', description: '' },
+  { name: 'Veterinary Dentist', description: '' },
+  { name: 'Zookeeper', description: '' },
+  { name: 'Zoologist', description: '' },
 ];
 
-// ***********************************
-// ** Helper functions from
-// ** These should not need to be edited
-// ** www.github.com/alexa/alexa-cookbook
-// ***********************************
-
-// ***********************************
-// ** Dialog Management
-// ***********************************
+/* HELPER FUNCTIONS */
 
 function getSlotValues(filledSlots) {
-    //given event.request.intent.slots, a slots values object so you have
-    //what synonym the person said - .synonym
-    //what that resolved to - .resolved
-    //and if it's a word that is in your slot values - .isValidated
-    let slotValues = {};
+  const slotValues = {};
 
-    console.log("The filled slots: " + JSON.stringify(filledSlots));
-    Object.keys(filledSlots).forEach(function (item) {
+  console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
+  Object.keys(filledSlots).forEach((item) => {
+    const name = filledSlots[item].name;
 
-        // console.log("item in filledSlots: "+JSON.stringify(filledSlots[item]));
-
-        let name = filledSlots[item].name;
-        //console.log("name: "+name);
-
-        if (filledSlots[item] &&
-             filledSlots[item].resolutions &&
-             filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-             filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-             filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-
-            switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-            case "ER_SUCCESS_MATCH":
-                slotValues[name] = {
-                    "synonym": filledSlots[item].value,
-                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
-                    "isValidated": true
-                };
-                break;
-            case "ER_SUCCESS_NO_MATCH":
-                slotValues[name] = {
-                    "synonym": filledSlots[item].value,
-                    "resolved": filledSlots[item].value,
-                    "isValidated":false
-                };
-                break;
-            }
-        } else {
-            slotValues[name] = {
-                "synonym": filledSlots[item].value,
-                "resolved": filledSlots[item].value,
-                "isValidated": false
-            };
-        }
-    },this);
-
-    //console.log("slot values: "+JSON.stringify(slotValues));
-    return slotValues;
-}
-
-// This function delegates multi-turn dialogs to Alexa.
-// For more information about dialog directives see the link below.
-// https://developer.amazon.com/docs/custom-skills/dialog-interface-reference.html
-function delegateSlotCollection() {
-    console.log("in delegateSlotCollection");
-    console.log("current dialogState: " + this.event.request.dialogState);
-
-    if (this.event.request.dialogState === "STARTED") {
-        console.log("in STARTED");
-        console.log(JSON.stringify(this.event));
-        let updatedIntent = this.event.request.intent;
-        // optionally pre-fill slots: update the intent object with slot values
-        // for which you have defaults, then return Dialog.Delegate with this
-        // updated intent in the updatedIntent property
-
-        disambiguateSlot.call(this);
-        console.log("disambiguated: " + JSON.stringify(this.event));
-        this.emit(":delegate", updatedIntent);
-    } else if (this.event.request.dialogState !== "COMPLETED") {
-        console.log("in not completed");
-        let updatedIntent = this.event.request.intent;
-        //console.log(JSON.stringify(this.event));
-
-        disambiguateSlot.call(this);
-        this.emit(":delegate", updatedIntent);
+    if (filledSlots[item] &&
+      filledSlots[item].resolutions &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+      switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+        case 'ER_SUCCESS_MATCH':
+          slotValues[name] = {
+            synonym: filledSlots[item].value,
+            resolved: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+            isValidated: true,
+          };
+          break;
+        case 'ER_SUCCESS_NO_MATCH':
+          slotValues[name] = {
+            synonym: filledSlots[item].value,
+            resolved: filledSlots[item].value,
+            isValidated: false,
+          };
+          break;
+        default:
+          break;
+      }
     } else {
-        console.log("in completed");
-        //console.log("returning: "+ JSON.stringify(this.event.request.intent));
-        // Dialog is now complete and all required slots should be filled,
-        // so call your normal intent handler.
-        return this.event.request.intent.slots;
+      slotValues[name] = {
+        synonym: filledSlots[item].value,
+        resolved: filledSlots[item].value,
+        isValidated: false,
+      };
     }
-    return null;
+  }, this);
+
+  return slotValues;
 }
 
-// If the user said a synonym that maps to more than one value, we need to ask
-// the user for clarification. Disambiguate slot will loop through all slots and
-// elicit confirmation for the first slot it sees that resolves to more than
-// one value.
-function disambiguateSlot() {
-    let currentIntent = this.event.request.intent;
-    let prompt = "";
-    Object.keys(this.event.request.intent.slots).forEach(function (slotName) {
-        let currentSlot = currentIntent.slots[slotName];
-        // let slotValue = slotHasValue(this.event.request, currentSlot.name);
-        if (currentSlot.confirmationStatus !== "CONFIRMED" &&
-            currentSlot.resolutions &&
-            currentSlot.resolutions.resolutionsPerAuthority[0]) {
-
-            if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_MATCH") {
-                // if there's more than one value that means we have a synonym that
-                // mapped to more than one value. So we need to ask the user for
-                // clarification. For example if the user said "mini dog", and
-                // "mini" is a synonym for both "small" and "tiny" then ask "Did you
-                // want a small or tiny dog?" to get the user to tell you
-                // specifically what type mini dog (small mini or tiny mini).
-                if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
-                    prompt = "Which would you like";
-                    let size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
-                    currentSlot.resolutions.resolutionsPerAuthority[0].values.forEach(function (element, index, arr) {
-                        prompt += ` ${(index === size - 1) ? " or" : " "} ${element.value.name}`;
-                    });
-
-                    prompt += "?";
-                    let reprompt = prompt;
-                    // In this case we need to disambiguate the value that they
-                    // provided to us because it resolved to more than one thing so
-                    // we build up our prompts and then emit elicitSlot.
-                    this.emit(":elicitSlot", currentSlot.name, prompt, reprompt);
-                }
-            } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_NO_MATCH") {
-                // Here is where you'll want to add instrumentation to your code
-                // so you can capture synonyms that you haven't defined.
-                console.log("NO MATCH FOR: ", currentSlot.name, " value: ", currentSlot.value);
-
-                if (REQUIRED_SLOTS.indexOf(currentSlot.name) > -1) {
-                    prompt = "What " + currentSlot.name + " are you looking for";
-                    this.emit(":elicitSlot", currentSlot.name, prompt, prompt);
-                }
-            }
-        }
-    }, this);
-}
-
-// Given the request an slot name, slotHasValue returns the slot value if one
-// was given for `slotName`. Otherwise returns false.
-function slotHasValue(request, slotName) {
-
-    let slot = request.intent.slots[slotName];
-
-    // uncomment if you want to see the request
-    // console.log("request = "+JSON.stringify(request));
-    let slotValue;
-
-    // if we have a slot, get the text and store it into speechOutput
-    if (slot && slot.value) {
-        // we have a value in the slot
-        slotValue = slot.value.toLowerCase();
-        return slotValue;
-    } else {
-        // we didn't get a value in the slot.
-        return false;
-    }
-}
+exports.handler = skillBuilder
+  .addRequestHandlers(
+    LaunchRequestHandler,
+    CouchPotatoIntent,
+    InProgressRecommendationIntent,
+    CompletedRecommendationIntent,
+    HelpHandler,
+    ExitHandler,
+    SessionEndedRequestHandler,    
+  )
+  .addErrorHandlers(ErrorHandler)
+  .lambda();

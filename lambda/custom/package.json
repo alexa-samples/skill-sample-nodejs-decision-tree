@@ -1,10 +1,11 @@
 {
   "name": "DecisionTree",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Alexa Decision Tree template",
   "main": "index.js",
   "dependencies": {
-    "alexa-sdk": "^1.0.0"
+    "ask-sdk-core": "^2.0.0",
+    "ask-sdk-model": "^1.0.0"
   },
   "devDependencies": {},
   "author": "Amazon.com",
