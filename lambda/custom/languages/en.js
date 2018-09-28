@@ -19,7 +19,7 @@ module.exports = {
     HELP_MESSAGE: 'This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.',
     HELP_REPROMPT: 'Would you like a career or do you want to be a couch potato?',
   },
-  options = [
+  options: [
     { name: 'Actor', description: '' },
     { name: 'Animal Control Worker', description: '' },
     { name: 'Animal Shelter Manager', description: '' },
