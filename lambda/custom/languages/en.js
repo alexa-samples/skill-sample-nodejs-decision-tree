@@ -1,0 +1,45 @@
+// Copyright <YEAR> Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Licensed under the Amazon Software License
+// http://aws.amazon.com/asl/
+
+module.exports = {
+  translation: {
+    WELCOME_MESSAGE: 'Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?',
+    WELCOME_REPROMPT: 'Do you want a career or to be a couch potato?',
+    COUCH_POTATO_RESPONSE: 'You don\'t want to start your career? Have fun wasting away on the couch.',
+    DECISION_PROMPT: 'Which would you like, ',
+    UNMATCHED_SLOT_PROMPT: `What %s are you looking for?`,
+    COMPLETED_RECOMMENDATION_MESSAGE: `So you want to be %s. You are an %s, you like %s and you %s tolerate blood. You should consider being a %s.`,
+    EXIT_MESSAGE: 'Goodbye!',
+    ERROR_MESSAGE: 'Sorry, I can\'t understand the command. Please say again.',
+    GET_ANSWER_ABBREVIATION: `The %s of %s is <say-as interpret-as='spell-out'>%s</say-as>.`,
+    GET_CURRENT_SCORE: `Your current score is %s out of %s.`,
+    GET_FINAL_SCORE: `Your final score is %s out of %s.`,
+    REPROMPT_SPEECH: `Which other state or capital would you like to know about?`,
+    HELP_MESSAGE: 'This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.',
+    HELP_REPROMPT: 'Would you like a career or do you want to be a couch potato?',
+  },
+  options: [
+    { name: 'Actor', description: '' },
+    { name: 'Animal Control Worker', description: '' },
+    { name: 'Animal Shelter Manager', description: '' },
+    { name: 'Artist', description: '' },
+    { name: 'Court Reporter', description: '' },
+    { name: 'Doctor', description: '' },
+    { name: 'Geoscientist', description: '' },
+    { name: 'Investment Banker', description: '' },
+    { name: 'Lighthouse Keeper', description: '' },
+    { name: 'Marine Ecologist', description: '' },
+    { name: 'Park Naturalist', description: '' },
+    { name: 'Pet Groomer', description: '' },
+    { name: 'Physical Therapist', description: '' },
+    { name: 'Security Guard', description: '' },
+    { name: 'Social Media Engineer', description: '' },
+    { name: 'Software Engineer', description: '' },
+    { name: 'Teacher', description: '' },
+    { name: 'Veterinary', description: '' },
+    { name: 'Veterinary Dentist', description: '' },
+    { name: 'Zookeeper', description: '' },
+    { name: 'Zoologist', description: '' },
+  ],
+};
