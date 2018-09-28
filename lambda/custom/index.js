@@ -150,7 +150,7 @@ const CompletedRecommendationIntent = {
 
 
     return responseBuilder
-      .speak(requestAttributes.t('COMPLETED_RECOMMENDATION_MESSAGE', slotValues.salaryImportance.resolved, slotValues.personality.resolved, slotValues.preferredSpecies.resolved, (slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"), occupation.name);
+      .speak(requestAttributes.t('COMPLETED_RECOMMENDATION_MESSAGE', slotValues.salaryImportance.resolved, slotValues.personality.resolved, slotValues.preferredSpecies.resolved, (slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"), occupation.name))
       .getResponse();
   },
 };
@@ -168,7 +168,7 @@ const HelpHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
 
     return responseBuilder
-      .speak(requestAttributes.t('HELP_MESSAGE')
+      .speak(requestAttributes.t('HELP_MESSAGE'))
       .reprompt(requestAttributes.t('HELP_REPROMPT'))
       .getResponse();
   },
@@ -188,7 +188,7 @@ const ExitHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
 
     return responseBuilder
-      .speak(requestAttributes.t('EXIT_MESSAGE')
+      .speak(requestAttributes.t('EXIT_MESSAGE'))
       .getResponse();
   },
 };
@@ -217,7 +217,7 @@ const ErrorHandler = {
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
 
     return responseBuilder
-      .speak(requestAttributes.t('ERROR_MESSAGE')
+      .speak(requestAttributes.t('ERROR_MESSAGE'))
       .reprompt(requestAttributes.t('ERROR_MESSAGE'))
       .getResponse();
   },
