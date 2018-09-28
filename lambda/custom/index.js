@@ -40,9 +40,13 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?')
-      .reprompt('Do you want a career or to be a couch potato?')
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+    return responseBuilder
+      .speak(requestAttributes.t('WELCOME_MESSAGE'))
+      .reprompt(requestAttributes.t('WELCOME_REPROMPT'))
       .getResponse();
   },
 };
@@ -55,8 +59,12 @@ const CouchPotatoIntent = {
       && request.intent.name === 'CouchPotatoIntent';
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('You don\'t want to start your career? Have fun wasting away on the couch.')
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+    return responseBuilder
+      .speak(requestAttributes.t('COUCH_POTATO_RESPONSE'))
       .getResponse();
   },
 };
@@ -75,12 +83,16 @@ const InProgressRecommendationIntent = {
 
     for (const slotName of Object.keys(handlerInput.requestEnvelope.request.intent.slots)) {
       const currentSlot = currentIntent.slots[slotName];
+      const attributesManager = handlerInput.attributesManager;
+      const responseBuilder = handlerInput.responseBuilder;
+      const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
       if (currentSlot.confirmationStatus !== 'CONFIRMED'
                 && currentSlot.resolutions
                 && currentSlot.resolutions.resolutionsPerAuthority[0]) {
         if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_MATCH') {
           if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
-            prompt = 'Which would you like';
+            prompt = requestAttributes.t('DECISION_PROMPT');
             const size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
 
             currentSlot.resolutions.resolutionsPerAuthority[0].values
@@ -90,7 +102,7 @@ const InProgressRecommendationIntent = {
 
             prompt += '?';
 
-            return handlerInput.responseBuilder
+            return responseBuilder
               .speak(prompt)
               .reprompt(prompt)
               .addElicitSlotDirective(currentSlot.name)
@@ -98,9 +110,9 @@ const InProgressRecommendationIntent = {
           }
         } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_NO_MATCH') {
           if (requiredSlots.indexOf(currentSlot.name) > -1) {
-            prompt = `What ${currentSlot.name} are you looking for`;
+            prompt = requestAttributes.t(UNMATCHED_SLOT_PROMPT, currentSlot.name);
 
-            return handlerInput.responseBuilder
+            return responseBuilder
               .speak(prompt)
               .reprompt(prompt)
               .addElicitSlotDirective(currentSlot.name)
@@ -110,7 +122,7 @@ const InProgressRecommendationIntent = {
       }
     }
 
-    return handlerInput.responseBuilder
+    return responseBuilder
       .addDelegateDirective(currentIntent)
       .getResponse();
   },
@@ -128,19 +140,17 @@ const CompletedRecommendationIntent = {
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
 
     const slotValues = getSlotValues(filledSlots);
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
 
     const key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
-    const occupation = options[slotsToOptionsMap[key]];
+    const occupation = requestAttributes.options[slotsToOptionsMap[key]];
 
-    const speechOutput = `So you want to be ${slotValues.salaryImportance.resolved
-    }. You are an ${slotValues.personality.resolved
-    }, you like ${slotValues.preferredSpecies.resolved
-    }  and you ${slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"
-    } tolerate blood ` +
-            `. You should consider being a ${occupation.name}`;
 
-    return handlerInput.responseBuilder
-      .speak(speechOutput)
+
+    return responseBuilder
+      .speak(requestAttributes.t('COMPLETED_RECOMMENDATION_MESSAGE', slotValues.salaryImportance.resolved, slotValues.personality.resolved, slotValues.preferredSpecies.resolved, (slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"), occupation.name);
       .getResponse();
   },
 };
@@ -153,9 +163,13 @@ const HelpHandler = {
       && request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.')
-      .reprompt('Would you like a career or do you want to be a couch potato?')
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+    return responseBuilder
+      .speak(requestAttributes.t('HELP_MESSAGE')
+      .reprompt(requestAttributes.t('HELP_REPROMPT'))
       .getResponse();
   },
 };
@@ -169,8 +183,12 @@ const ExitHandler = {
         || request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('Bye')
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+    return responseBuilder
+      .speak(requestAttributes.t('EXIT_MESSAGE')
       .getResponse();
   },
 };
@@ -194,9 +212,13 @@ const ErrorHandler = {
   handle(handlerInput, error) {
     console.log(`Error handled: ${error.message}`);
 
-    return handlerInput.responseBuilder
-      .speak('Sorry, I can\'t understand the command. Please say again.')
-      .reprompt('Sorry, I can\'t understand the command. Please say again.')
+    const attributesManager = handlerInput.attributesManager;
+    const responseBuilder = handlerInput.responseBuilder;
+    const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+
+    return responseBuilder
+      .speak(requestAttributes.t('ERROR_MESSAGE')
+      .reprompt(requestAttributes.t('ERROR_MESSAGE'))
       .getResponse();
   },
 };
@@ -238,30 +260,6 @@ const slotsToOptionsMap = {
   'very-extrovert-high-animals': 1,
   'very-extrovert-high-people': 5,
 };
-
-const options = [
-  { name: 'Actor', description: '' },
-  { name: 'Animal Control Worker', description: '' },
-  { name: 'Animal Shelter Manager', description: '' },
-  { name: 'Artist', description: '' },
-  { name: 'Court Reporter', description: '' },
-  { name: 'Doctor', description: '' },
-  { name: 'Geoscientist', description: '' },
-  { name: 'Investment Banker', description: '' },
-  { name: 'Lighthouse Keeper', description: '' },
-  { name: 'Marine Ecologist', description: '' },
-  { name: 'Park Naturalist', description: '' },
-  { name: 'Pet Groomer', description: '' },
-  { name: 'Physical Therapist', description: '' },
-  { name: 'Security Guard', description: '' },
-  { name: 'Social Media Engineer', description: '' },
-  { name: 'Software Engineer', description: '' },
-  { name: 'Teacher', description: '' },
-  { name: 'Veterinary', description: '' },
-  { name: 'Veterinary Dentist', description: '' },
-  { name: 'Zookeeper', description: '' },
-  { name: 'Zoologist', description: '' },
-];
 
 /* HELPER FUNCTIONS */
 
