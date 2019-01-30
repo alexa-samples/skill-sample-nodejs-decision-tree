@@ -27,7 +27,7 @@
       "custom": {
         "endpoint": {
           "sourceDir": "lambda/custom",
-          "uri": "ask-custom-DecisionTree-default"
+          "uri": "ask-decision-tree-nodejs"
         }
       }
     },
