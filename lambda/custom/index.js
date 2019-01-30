@@ -1,6 +1,6 @@
 /**
 
-    Copyright 2017-2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+    Copyright 2017-2019 Amazon.com, Inc. and its affiliates. All Rights Reserved.
     Licensed under the Amazon Software License (the "License").
     You may not use this file except in compliance with the License.
     A copy of the License is located at
@@ -42,9 +42,9 @@ const LaunchRequestHandler = {
 };
 
 const FallbackHandler = {
-  // 2018-May-01: AMAZON.FallackIntent is only currently available in en-US locale.
-  //              This handler will not be triggered except in that locale, so it can be
-  //              safely deployed for any locale.
+  // 2018-Nov-21: AMAZON.FallackIntent is currently available in en-* and de-DE locales.
+  //              This handler will not be triggered except in those locales, so it can be
+  //              safely deployed here in the code for any locale.
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'IntentRequest'
