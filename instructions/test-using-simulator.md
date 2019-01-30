@@ -11,7 +11,7 @@ So far, we have [created a Voice User Interface](./setup-vui-alexa-hosted.md) an
 3. Enable Testing by activating the **Test is enabled for this skill** slider. It should be underneath the top navigation menu.
 
 4. To validate that your skill is working as expected, invoke your skill from the **Alexa Simulator**. You can either type or click and hold the mic from the input box to use your voice.
-	1. **Type** "Open" followed by the invocation name you gave your skill in [Step 1](./configure-skill.md). For example, "Open Decision Tree".
+	1. **Type** "Open" followed by the invocation name you gave your skill previously. For example, "open decision tree".
 	2. **Use your voice** by clicking and holding the mic on the side panel and saying "Open" followed by the invocation name you gave your skill.
 	3. **If you've forgotten the invocation name** for your skill, revisit the **Build** panel on the top navigation menu and select Invocation from the sidebar to review it.
 
@@ -71,6 +71,10 @@ If you are not using Alexa-Hosted, but are hosting the code in your AWS account,
     *  [Unit Testing with Alexa](https://github.com/alexa/alexa-cookbook/tree/master/testing/postman/README.md) - a modern approach to unit testing your Alexa skills with [Postman](http://getpostman.com) and [Amazon API Gateway](http://aws.amazon.com/apigateway).
 
 3.  **If your sample skill is working properly, you can now customize your skill.**
+
+
+[![Next](https://m.media-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-skills-kit/tutorials/general/buttons/button_next_customization._TTH_.png)](./customize-skill-content.md)
+
 
 <br/><br/>
 
