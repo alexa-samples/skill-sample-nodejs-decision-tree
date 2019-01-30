@@ -16,10 +16,6 @@
           "samples": []
         },
         {
-         "name": "AMAZON.FallbackIntent",
-         "samples": []
-       },
-        {
           "name": "CouchPotatoIntent",
           "samples": [
             "couch potato",

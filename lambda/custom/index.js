@@ -1,6 +1,6 @@
 /**
 
-    Copyright 2017-2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+    Copyright 2017-2019 Amazon.com, Inc. and its affiliates. All Rights Reserved.
     Licensed under the Amazon Software License (the "License").
     You may not use this file except in compliance with the License.
     A copy of the License is located at
@@ -41,11 +41,28 @@ const LaunchRequestHandler = {
   },
 };
 
+const FallbackHandler = {
+  // 2018-Nov-21: AMAZON.FallackIntent is currently available in en-* and de-DE locales.
+  //              This handler will not be triggered except in those locales, so it can be
+  //              safely deployed here in the code for any locale.
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'AMAZON.FallbackIntent';
+  },
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak(FALLBACK_MESSAGE)
+      .reprompt(FALLBACK_REPROMPT)
+      .getResponse();
+  },
+};
+
 const CouchPotatoIntent = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
-    return request.type === 'IntentRequest' 
+    return request.type === 'IntentRequest'
       && request.intent.name === 'CouchPotatoIntent';
   },
   handle(handlerInput) {
@@ -143,7 +160,7 @@ const HelpHandler = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
-    return request.type === 'IntentRequest' 
+    return request.type === 'IntentRequest'
       && request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
@@ -198,6 +215,9 @@ const ErrorHandler = {
 /* CONSTANTS */
 
 const skillBuilder = Alexa.SkillBuilders.custom();
+const SKILL_NAME = 'Decision Tree';
+const FALLBACK_MESSAGE = `The ${SKILL_NAME} skill can\'t help you with that.  It can recommend the best job for you. Do you want to start your career or be a couch potato?`;
+const FALLBACK_REPROMPT = 'What can I help you with?';
 
 const requiredSlots = [
   'preferredSpecies',
@@ -309,7 +329,8 @@ exports.handler = skillBuilder
     CompletedRecommendationIntent,
     HelpHandler,
     ExitHandler,
-    SessionEndedRequestHandler,    
+    FallbackHandler,
+    SessionEndedRequestHandler,
   )
   .addErrorHandlers(ErrorHandler)
   .lambda();
