@@ -35,8 +35,8 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?')
-      .reprompt('Do you want a career or to be a couch potato?')
+      .speak('Welcome to Choice Ladder. I will recommend ice cream flavors, and toppings that describe you. Do you want to start your journey or do you rather be a fruit cake?')
+      .reprompt('Do you want to start your journey or do you rather be a fruit cake?')
       .getResponse();
   },
 };
@@ -58,16 +58,16 @@ const FallbackHandler = {
   },
 };
 
-const CouchPotatoIntent = {
+const FruitCakeIntent = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
     return request.type === 'IntentRequest'
-      && request.intent.name === 'CouchPotatoIntent';
+      && request.intent.name === 'FruitCakeIntent';
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('You don\'t want to start your career? Have fun wasting away on the couch.')
+      .speak('You don\'t want to start your journey? Have fun wasting away with fruit cake.')
       .getResponse();
   },
 };
@@ -77,7 +77,7 @@ const InProgressRecommendationIntent = {
     const request = handlerInput.requestEnvelope.request;
 
     return request.type === 'IntentRequest'
-      && request.intent.name === 'RecommendationIntent'
+      && request.intent.name === 'DecisionIntent'
       && request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
@@ -132,7 +132,7 @@ const CompletedRecommendationIntent = {
     const request = handlerInput.requestEnvelope.request;
 
     return request.type === 'IntentRequest'
-      && request.intent.name === 'RecommendationIntent'
+      && request.intent.name === 'DecisionIntent'
       && request.dialogState === 'COMPLETED';
   },
   handle(handlerInput) {
@@ -140,15 +140,14 @@ const CompletedRecommendationIntent = {
 
     const slotValues = getSlotValues(filledSlots);
 
-    const key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
+    const key = `${slotValues.colormatter.resolved}-${slotValues.emotion.resolved}-${slotValues.moneymatter.resolved}-${slotValues.quality.resolved}`;
     const occupation = options[slotsToOptionsMap[key]];
 
-    const speechOutput = `So you want to be ${slotValues.salaryImportance.resolved
-    }. You are an ${slotValues.personality.resolved
-    }, you like ${slotValues.preferredSpecies.resolved
-    }  and you ${slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"
-    } tolerate blood ` +
-            `. You should consider being a ${occupation.name}`;
+    const speechOutput = `So you like ${slotValues.colormatter.resolved
+    }. You are a ${slotValues.emotion.resolved
+    }, money matters: ${slotValues.moneymatter.resolved
+    }  and you are ${slotValues.quality.resolved
+    } ` + `. You prefer ${occupation.name}`;
 
     return handlerInput.responseBuilder
       .speak(speechOutput)
@@ -165,8 +164,8 @@ const HelpHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.')
-      .reprompt('Would you like a career or do you want to be a couch potato?')
+      .speak('This is Choice Ladder. I can help you find the ice cream flavor that matches your personality. You can say, recommend a flavor.')
+      .reprompt('Do you want to start your journey or do you want to be a fruit cake?')
       .getResponse();
   },
 };
@@ -215,66 +214,108 @@ const ErrorHandler = {
 /* CONSTANTS */
 
 const skillBuilder = Alexa.SkillBuilders.custom();
-const SKILL_NAME = 'Decision Tree';
-const FALLBACK_MESSAGE = `The ${SKILL_NAME} skill can\'t help you with that.  It can recommend the best job for you. Do you want to start your career or be a couch potato?`;
+const SKILL_NAME = 'Choice Ladder';
+const FALLBACK_MESSAGE = `The ${SKILL_NAME} skill can\'t help you with that.  It can recommend the flavor that matches your personality. Do you want to start your journey or be a fruit cake?`;
 const FALLBACK_REPROMPT = 'What can I help you with?';
 
 const requiredSlots = [
-  'preferredSpecies',
-  'bloodTolerance',
-  'personality',
-  'salaryImportance',
+  'colormatter',
+  'emotion',
+  'moneymatter',
+  'quality',
 ];
 
+
 const slotsToOptionsMap = {
-  'unimportant-introvert-low-animals': 20,
-  'unimportant-introvert-low-people': 8,
-  'unimportant-introvert-high-animals': 1,
-  'unimportant-introvert-high-people': 4,
-  'unimportant-extrovert-low-animals': 10,
-  'unimportant-extrovert-low-people': 3,
-  'unimportant-extrovert-high-animals': 11,
-  'unimportant-extrovert-high-people': 13,
-  'somewhat-introvert-low-animals': 20,
-  'somewhat-introvert-low-people': 6,
-  'somewhat-introvert-high-animals': 19,
-  'somewhat-introvert-high-people': 14,
-  'somewhat-extrovert-low-animals': 2,
-  'somewhat-extrovert-low-people': 12,
-  'somewhat-extrovert-high-animals': 17,
-  'somewhat-extrovert-high-people': 16,
-  'very-introvert-low-animals': 9,
-  'very-introvert-low-people': 15,
-  'very-introvert-high-animals': 17,
-  'very-introvert-high-people': 7,
-  'very-extrovert-low-animals': 17,
-  'very-extrovert-low-people': 0,
-  'very-extrovert-high-animals': 1,
-  'very-extrovert-high-people': 5,
-};
+	'caramel-balanced-sometimes-loving': 0,
+	'caramel-balanced-sometimes-crafty': 1,
+	'caramel-balanced-sometimes-minamilistic': 2,
+	'caramel-balanced-yes-loving': 0,
+	'caramel-balanced-yes-crafty': 1,
+	'caramel-balanced-yes-minamilistic': 2,	
+	'caramel-balanced-no-loving': 0,
+	'caramel-balanced-no-crafty': 1,
+	'caramel-balanced-no-minamilistic': 2,
+	'caramel-joyful-sometimes-loving': 0,
+	'caramel-joyful-sometimes-crafty': 1,
+	'caramel-joyful-sometimes-minamilistic': 2,
+	'caramel-joyful-yes-loving': 0,
+	'caramel-joyful-yes-crafty': 1,
+	'caramel-joyful-yes-minamilistic': 2,	
+	'caramel-joyful-no-loving': 0,
+	'caramel-joyful-no-crafty': 1,
+	'caramel-joyful-no-minamilistic': 2,
+	'caramel-peaceful-sometimes-loving': 0,
+	'caramel-peaceful-sometimes-crafty': 1,
+	'caramel-peaceful-sometimes-minamilistic': 2,
+	'caramel-peaceful-yes-loving': 0,
+	'caramel-peaceful-yes-crafty': 1,
+	'caramel-peaceful-yes-minamilistic': 2,	
+	'caramel-peaceful-no-loving':0 ,
+	'caramel-peaceful-no-crafty': 1,
+	'caramel-peaceful-no-minamilistic': 2,
+	'mocha-balanced-sometimes-loving': 0,
+	'mocha-balanced-sometimes-crafty':1 ,
+	'mocha-balanced-sometimes-minamilistic': 2,
+	'mocha-balanced-yes-loving': 0,
+	'mocha-balanced-yes-crafty': 1,
+	'mocha-balanced-yes-minamilistic':2 ,	
+	'mocha-balanced-no-loving': 0,
+	'mocha-balanced-no-crafty': 1,
+	'mocha-balanced-no-minamilistic':2 ,
+	'mocha-joyful-sometimes-loving': 0,
+	'mocha-joyful-sometimes-crafty':1 ,
+	'mocha-joyful-sometimes-minamilistic':2 ,
+	'mocha-joyful-yes-loving': 0,
+	'mocha-joyful-yes-crafty': 1,
+	'mocha-joyful-yes-minamilistic':2 ,	
+	'mocha-joyful-no-loving':0 ,
+	'mocha-joyful-no-crafty': 1,
+	'mocha-joyful-no-minamilistic': 2,
+	'mocha-peaceful-sometimes-loving': 0,
+	'mocha-peaceful-sometimes-crafty': 1,
+	'mocha-peaceful-sometimes-minamilistic':2 ,
+	'mocha-peaceful-yes-loving':0 ,
+	'mocha-peaceful-yes-crafty':1 ,
+	'mocha-peaceful-yes-minamilistic':2 ,	
+	'mocha-peaceful-no-loving': 0,
+	'mocha-peaceful-no-crafty': 1,
+	'mocha-peaceful-no-minamilistic':2 ,	
+	'dazzling white-balanced-sometimes-loving': 0,
+	'dazzling white-balanced-sometimes-crafty': 2,
+	'dazzling white-balanced-sometimes-minamilistic': 0,
+	'dazzling white-balanced-yes-loving': 1,
+	'dazzling white-balanced-yes-crafty': 2,
+	'dazzling white-balanced-yes-minamilistic': 0,	
+	'dazzling white-balanced-no-loving': 1,
+	'dazzling white-balanced-no-crafty': 2,
+	'dazzling white-balanced-no-minamilistic': 0,
+	'dazzling white-joyful-sometimes-loving': 1,
+	'dazzling white-joyful-sometimes-crafty': 2,
+	'dazzling white-joyful-sometimes-minamilistic': 0,
+	'dazzling white-joyful-yes-loving': 1,
+	'dazzling white-joyful-yes-crafty': 2,
+	'dazzling white-joyful-yes-minamilistic': 0,	
+	'dazzling white-joyful-no-loving': 1,
+	'dazzling white-joyful-no-crafty': 2,
+	'dazzling white-joyful-no-minamilistic': 0,
+	'dazzling white-peaceful-sometimes-crafty': 1,
+	'dazzling white-peaceful-sometimes-minamilistic': 2,
+	'dazzling white-peaceful-yes-loving': 0,
+	'dazzling white-peaceful-yes-crafty': 1,
+	'dazzling white-peaceful-yes-minamilistic': 2,	
+	'dazzling white-peaceful-no-loving': 0,
+	'dazzling white-peaceful-no-crafty': 1,
+	'dazzling white-peaceful-no-minamilistic': 2,
+	
+}
+
 
 const options = [
-  { name: 'Actor', description: '' },
-  { name: 'Animal Control Worker', description: '' },
-  { name: 'Animal Shelter Manager', description: '' },
-  { name: 'Artist', description: '' },
-  { name: 'Court Reporter', description: '' },
-  { name: 'Doctor', description: '' },
-  { name: 'Geoscientist', description: '' },
-  { name: 'Investment Banker', description: '' },
-  { name: 'Lighthouse Keeper', description: '' },
-  { name: 'Marine Ecologist', description: '' },
-  { name: 'Park Naturalist', description: '' },
-  { name: 'Pet Groomer', description: '' },
-  { name: 'Physical Therapist', description: '' },
-  { name: 'Security Guard', description: '' },
-  { name: 'Social Media Engineer', description: '' },
-  { name: 'Software Engineer', description: '' },
-  { name: 'Teacher', description: '' },
-  { name: 'Veterinary', description: '' },
-  { name: 'Veterinary Dentist', description: '' },
-  { name: 'Zookeeper', description: '' },
-  { name: 'Zoologist', description: '' },
+  { name: 'vanilla ice cream', description: '' },
+  { name: 'chocolate ice cream', description: '' },
+  { name: 'coffee ice cream', description: '' },
+ 
 ];
 
 /* HELPER FUNCTIONS */
@@ -324,7 +365,7 @@ function getSlotValues(filledSlots) {
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
-    CouchPotatoIntent,
+    FruitCakeIntent,
     InProgressRecommendationIntent,
     CompletedRecommendationIntent,
     HelpHandler,
